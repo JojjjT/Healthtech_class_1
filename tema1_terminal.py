@@ -1100,120 +1100,60 @@ def _(mo):
     return
 
 
-# ─── Estado del terminal ───
+# ─── Estado (se recrea al reiniciar, porque depende de HOME) ───
 @app.cell(hide_code=True)
-def _(mo):
-    get_term, set_term = mo.state({
-        "home": None,
-        "cwd":  None,
-        "entries": [],
-    })
-    return (get_term, set_term)
+def _(HOME, mo):
+    get_cwd, set_cwd = mo.state(str(HOME))
+    get_hist, set_hist = mo.state([])
+    return get_cwd, get_hist, set_cwd, set_hist
 
 
-# ─── Prompt actual ───
+# ─── Entrada: el comando se ejecuta en un callback ───
 @app.cell(hide_code=True)
-def _(mo, HOME, get_term):
-    import os as _os
-    _state = get_term()
-    _cur = str(HOME)
-    if _state["home"] != _cur:
-        _cwd = _cur
-    else:
-        _cwd = _state["cwd"]
-    _rel = _os.path.relpath(_cwd, _cur)
-    _prompt = "alumno@lab:~$" if _rel == "." else f"alumno@lab:~/{_rel}$"
-    mo.md(f"**Prompt actual:** `{_prompt}`")
-    return
+def _(HOME, Terminal, get_cwd, get_hist, mo, set_cwd, set_hist):
+    def _run(value):
+        cmd = (value or "").strip()
+        if not cmd:
+            return
+        if cmd == "clear":
+            set_hist([])
+            return
+        t = Terminal(HOME)
+        t.cwd = get_cwd()
+        prompt = t.prompt          # prompt ANTES de ejecutar
+        out, err = t.run(cmd)
+        set_hist(get_hist() + [(prompt, cmd, out, err)])
+        set_cwd(t.cwd)
 
-
-# ─── Entrada (Enter para enviar) ───
-@app.cell(hide_code=True)
-def _(mo):
-    cmd_input = mo.ui.text(
-        placeholder="escribe un comando y pulsa Enter…",
-        full_width=True,
-    )
     cmd_form = mo.ui.form(
-        cmd_input,
+        mo.ui.text(placeholder="escribe un comando y pulsa Enter…", full_width=True),
         clear_on_submit=True,
         submit_button_label="▶ Ejecutar",
+        on_change=_run,
     )
     cmd_form
     return (cmd_form,)
 
 
-# ─── Ejecución ───
+# ─── Historial + prompt actual ───
 @app.cell(hide_code=True)
-def _(mo, cmd_form, HOME, get_term, set_term, Terminal):
-    if cmd_form.value:
-        _state = dict(get_term())
-        _home = str(HOME)
-
-        # Si cambió HOME (reset), reinicia el estado
-        if _state["home"] != _home:
-            _state = {"home": _home, "cwd": _home, "entries": []}
-        else:
-            _state["entries"] = list(_state["entries"])
-
-        _cmd = cmd_form.value.strip()
-
-        if _cmd == "clear":
-            _state["entries"] = []
-            set_term(_state)
-        elif _cmd:
-            _term = Terminal(HOME)
-            _term.cwd = _state["cwd"]
-            _out, _err = _term.run(_cmd)
-            _state["entries"].append({
-                "cwd": _state["cwd"],
-                "cmd": _cmd,
-                "out": _out,
-                "err": _err,
-            })
-            _state["cwd"] = _term.cwd
-            set_term(_state)
-    return
-
-
-# ─── Historial de la sesión ───
-@app.cell(hide_code=True)
-def _(mo, HOME, get_term):
-    import os as _os
-
-    _state = get_term()
-    _home = str(HOME)
-
-    if _state["home"] != _home:
-        _entries, _cwd = [], _home
-    else:
-        _entries, _cwd = _state["entries"], _state["cwd"]
-
-    def _prompt(p):
-        try:
-            rel = _os.path.relpath(p, _home)
-            return "alumno@lab:~$" if rel == "." else f"alumno@lab:~/{rel}$"
-        except (ValueError, TypeError):
-            return "alumno@lab:~$"
+def _(HOME, Terminal, cmd_form, get_cwd, get_hist, mo):
+    _t = Terminal(HOME)
+    _t.cwd = get_cwd()
 
     _lines = []
-    for _e in _entries:
-        _lines.append(f"{_prompt(_e['cwd'])} {_e['cmd']}")
-        if _e["out"]:
-            _lines.extend(_e["out"].rstrip("\n").split("\n"))
-        if _e["err"]:
-            _lines.extend(f"[stderr] {_l}" for _l in _e["err"].rstrip("\n").split("\n"))
+    for _prompt, _cmd, _out, _err in get_hist():
+        _lines.append(f"{_prompt} {_cmd}")
+        if _out:
+            _lines.extend(_out.rstrip("\n").split("\n"))
+        if _err:
+            _lines.extend(f"[stderr] {_l}" for _l in _err.rstrip("\n").split("\n"))
 
-    if not _lines:
-        _lines = [
-            f"{_prompt(_cwd)} █",
-            "",
-            "Escribe un comando arriba y pulsa Enter.",
-            "Comandos: pwd · ls · cd · mkdir · cp · mv · cat · rm · ln -s · wc · md5sum · tail · echo · clear",
-        ]
+    _lines.append(f"{_t.prompt} █")
+    if not get_hist():
+        _lines += ["", "Comandos: pwd · ls · cd · mkdir · cp · mv · cat · rm · ln -s · wc · md5sum · tail · echo · clear"]
 
     mo.md("```console\n" + "\n".join(_lines) + "\n```")
     return
-
 if name == "main":
 app.run()
