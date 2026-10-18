@@ -1,0 +1,1308 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tema 1 · Herramientas bioinformáticas</title><style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:#0b1220;overflow:hidden;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:0 0}
+section{width:1280px;height:720px;position:absolute;inset:0;overflow:hidden;display:none;flex-direction:column}
+section.on{display:flex}
+section>*{flex:none}
+section h1{margin:0 0 .5em;line-height:1.15}section h2{margin:.6em 0 .3em}
+section p{margin:.5em 0}section ul,section ol{margin:.4em 0;padding-left:1.4em}section li{margin:.2em 0}
+section header{position:absolute;top:22px;left:64px;right:64px}section footer{position:absolute;bottom:20px;left:64px}
+section .pg{position:absolute;bottom:20px;right:64px;font-size:15px;color:#64748b}
+table{border-collapse:collapse}td,th{border:1px solid #cbd5e1}pre{margin:.5em 0;overflow:hidden}
+section.cols2{display:block}
+#bar{position:fixed;left:0;top:0;height:4px;background:#2dd4bf;width:0;z-index:9;transition:width .2s}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:34vh;overflow:auto;background:rgba(15,23,42,.96);color:#e2e8f0;padding:14px 24px;font-size:17px;line-height:1.5;white-space:pre-wrap;display:none;z-index:10;border-top:3px solid #2dd4bf}
+#notes.show{display:block}
+#help{position:fixed;left:50%;transform:translateX(-50%);bottom:4px;transition:opacity 1s;color:#94a3b8;font:13px/1.3 system-ui;z-index:8;text-align:right;opacity:.8}
+body.ov{overflow:auto}body.ov #stage{position:static;transform:none!important;width:auto;height:auto;display:grid;grid-template-columns:repeat(auto-fill,320px);gap:14px;padding:18px;justify-content:center}
+body.ov section{display:flex;position:relative;inset:auto;transform:scale(.25);transform-origin:0 0;margin:0 -960px -540px 0;cursor:pointer;outline:4px solid transparent}
+body.ov section.on{outline-color:#2dd4bf}body.ov #help,body.ov #bar,body.ov #notes{display:none}
+@media print{html,body{overflow:visible;background:#fff;height:auto}#stage{position:static;transform:none!important}section{display:flex!important;position:relative;page-break-after:always;break-after:page}#bar,#notes,#help{display:none!important}@page{size:1280px 720px;margin:0}}
+section {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 27px;
+  color: #0f172a;
+  background: #ffffff;
+  padding: 70px 64px 56px 64px;
+}
+header, footer { font-size: 15px; color: #64748b; }
+h1 { color: #0f766e; font-size: 1.55em; border-bottom: 3px solid #99f6e4; padding-bottom: 6px; }
+h2 { color: #0f766e; font-size: 1.15em; }
+strong { color: #0f766e; }
+em { color: #475569; }
+code { background: #f1f5f9; color: #be123c; border-radius: 4px; padding: 0 4px; font-size: 0.92em; }
+pre { background: #0f172a; border-radius: 10px; padding: 14px 18px; }
+pre code { background: transparent; color: #e2e8f0; font-size: 0.66em; line-height: 1.45; padding: 0; }
+table { font-size: 0.72em; margin: 0 auto; }
+th { background: #0f766e; color: #fff; }
+td, th { padding: 5px 12px; }
+blockquote { border-left: 6px solid #5eead4; background: #f0fdfa; color: #134e4a; padding: 6px 20px; margin: 14px 0; font-size: 0.9em; }
+img { display: block; margin: 0 auto; }
+section.lead { background: linear-gradient(135deg, #0f766e 0%, #134e4a 100%); color: #f0fdfa; justify-content: center; }
+section.lead h1 { color: #ffffff; border: none; font-size: 2em; }
+section.lead h2, section.lead strong, section.lead em { color: #99f6e4; }
+section.lead header, section.lead footer { color: #99f6e4; }
+section.lead table { color: #0f172a; }
+section.cols2 { columns: 2; column-gap: 48px; }
+section.cols2 h1 { column-span: all; }
+section.small { font-size: 23px; }
+section.small pre code { font-size: 0.6em; }
+section.tiny table { font-size: 0.62em; }</style></head><body>
+<div id="bar"></div><div id="stage"><section class="lead" data-i="1"><header></header><h1>Tema 1 · Herramientas bioinformáticas</h1>
+<h2>Del bit a la terminal de Linux</h2>
+<p><strong>Bioinformática y análisis de datos ómicos</strong> · Laboratorio 1 · <em>2 horas</em></p><footer></footer></section>
+<section class="" data-i="2"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Agenda: 120 minutos</h1>
+<table>
+<thead>
+<tr>
+<th>Min</th>
+<th>Bloque</th>
+<th>Contenido</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0–5</td>
+<td>Introducción</td>
+<td>Objetivos y por qué importa</td>
+</tr>
+<tr>
+<td>5–30</td>
+<td><strong>A · El ordenador y los datos</strong></td>
+<td>CPU/RAM/disco, bits, ASCII, formatos, md5</td>
+</tr>
+<tr>
+<td>30–45</td>
+<td><strong>B · Sistemas operativos</strong></td>
+<td>Windows vs Unix, rutas, árbol de directorios</td>
+</tr>
+<tr>
+<td>45–75</td>
+<td><strong>C · La terminal</strong></td>
+<td>Comandos, permisos, ayuda, redirecciones, tuberías</td>
+</tr>
+<tr>
+<td>75–100</td>
+<td><strong>Práctica 1.1</strong></td>
+<td>11 ejercicios en el cuaderno <em>marimo</em></td>
+</tr>
+<tr>
+<td>100–112</td>
+<td><strong>Práctica 1.2</strong></td>
+<td>Permisos, head/tail, md5</td>
+</tr>
+<tr>
+<td>112–120</td>
+<td>Cierre</td>
+<td>Mini-quiz, chuleta y entrega</td>
+</tr>
+</tbody>
+</table><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">2</span></section>
+<section class="" data-i="3"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Objetivos de aprendizaje</h1>
+<p>Al terminar la sesión sabrás:</p>
+<ol>
+<li>Explicar cómo <strong>almacena y procesa</strong> información un ordenador (bit, byte, RAM, disco).</li>
+<li>Entender que <strong>cada formato de archivo es una codificación</strong> y que la extensión <em>no</em> lo cambia.</li>
+<li>Verificar la integridad de un archivo con <strong>md5</strong>.</li>
+<li>Orientarte en un sistema <strong>Unix/Linux</strong>: rutas absolutas y relativas.</li>
+<li>Usar la terminal: <code>pwd ls cd mkdir cp mv rm ln cat head tail chmod md5sum</code>.</li>
+<li><strong>Redirigir</strong> salidas (<code>&gt;</code>, <code>2&gt;</code>) y <strong>encadenar</strong> comandos (<code>|</code>).</li>
+<li>Leer la <strong>ayuda</strong> de un programa desconocido.</li>
+</ol><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">3</span></section>
+<section class="" data-i="4"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>¿Por qué esto importa en bioinformática?</h1>
+<ul>
+<li>Los datos son <strong>enormes</strong>: un FASTQ de secuenciación puede pesar decenas de GB.</li>
+<li>Las herramientas (BWA, samtools, GATK…) <strong>viven en Linux</strong> y se usan desde la terminal.</li>
+<li>Los servidores y clústeres de cálculo <strong>no tienen interfaz gráfica</strong>.</li>
+<li>Un comando escrito es <strong>reproducible</strong>: se guarda, se comparte, se repite.</li>
+</ul>
+<blockquote>
+<p>Uno de los mayores obstáculos de quien empieza en bioinformática no es la biología ni la estadística: es <strong>aprender a usar programas</strong> a base de leer su ayuda.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">4</span></section>
+<section class="lead" data-i="5"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Bloque A</h1>
+<h2>El ordenador y la codificación de la información</h2>
+<p><em>(minutos 5 – 30)</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">5</span></section>
+<section class="" data-i="6"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Los tres componentes clave</h1>
+<p><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgMzAwIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiIgeG1sbnM6YzJwYT0iaHR0cDovL2MycGEub3JnL21hbmlmZXN0Ij48bWV0YWRhdGE+PGMycGE6bWFuaWZlc3Q+QUFBV2dtcDFiV0lBQUFBZWFuVnRaR015Y0dFQUVRQVFnQUFBcWdBNG0zRURZekp3WVFBQUFCWmNhblZ0WWdBQUFFZHFkVzFrWXpKdFlRQVJBQkNBQUFDcUFEaWJjUU4xY200Nll6SndZVHBoTVdKbE1EazNZUzAxWTJZM0xUUTFOVGt0T0RSbU1DMDFNRGczWVRWaE16VXlaRGdBQUFBRGwycDFiV0lBQUFBcGFuVnRaR015WVhNQUVRQVFnQUFBcWdBNG0zRURZekp3WVM1aGMzTmxjblJwYjI1ekFBQUFBTHhxZFcxaUFBQUFSR3AxYldSalltOXlBQkVBRUlBQUFLb0FPSnR4RTJNeWNHRXVhVzVuY21Wa2FXVnVkQzUyTXdBQUFBQVlZekp6YUc0aU5ZR1pMclR0R0JUWFliTTFaYlFBQUFCd1kySnZjcU5wWkdNNlptOXliV0YwYldsdFlXZGxMM04yWnl0NGJXeHFhVzV6ZEdGdVkyVkpSSGdzZUcxd09tbHBaRHBtWW1Ka1lUUXpNeTA1TTJJekxUUTVZemN0WWpjMll5MHlOamc0TXpabE1EWTBZVGxzY21Wc1lYUnBiMjV6YUdsd2FIQmhjbVZ1ZEU5bUFBQUI0bXAxYldJQUFBQkJhblZ0WkdOaWIzSUFFUUFRZ0FBQXFnQTRtM0VUWXpKd1lTNWhZM1JwYjI1ekxuWXlBQUFBQUJoak1uTm9rcXJld2pPc2JNcmVteEVkZ21FdndnQUFBWmxqWW05eW9tZGhZM1JwYjI1emdxSm1ZV04wYVc5dWEyTXljR0V1YjNCbGJtVmthbkJoY21GdFpYUmxjbk9oYTJsdVozSmxaR2xsYm5SemdhSmpkWEpzZUMxelpXeG1JMnAxYldKbVBXTXljR0V1WVhOelpYSjBhVzl1Y3k5ak1uQmhMbWx1WjNKbFpHbGxiblF1ZGpOa2FHRnphRmdnVFVpZ3N2V2ZEYmJGQUVEYjlmRCtsTWFhRWhielBneDlvTHVFWDg3cERDMmtabUZqZEdsdmJuZ2RZMjl0TG1GdWRHaHliM0JwWXk1amJHRjFaR1V1Y0hKdmRtbGtaV1JxY0dGeVlXMWxkR1Z5YzZGNEgyTnZiUzVoYm5Sb2NtOXdhV011YjNKcFoybHVMV052Ym1acFpHVnVZMlZuZFc1cmJtOTNibXRrWlhOamNtbHdkR2x2Ym5obVEyeGhkV1JsSUhCeWIzWnBaR1ZrSUhSb2FYTWdabWxzWlNCaGRDQjBhR1VnY21WeGRXVnpkQ0J2WmlCaElIVnpaWElnWVc1a0lHMWhlU0JvWVhabElHTnlaV0YwWldRZ2IzSWdiVzlrYVdacFpXUWdkR2hsSUdacGJHVWdZMjl1ZEdWdWRITXViWE52Wm5SM1lYSmxRV2RsYm5TaFpHNWhiV1ZtUTJ4aGRXUmxjbUZzYkVGamRHbHZibk5KYm1Oc2RXUmxaUFVBQUFESWFuVnRZZ0FBQUVCcWRXMWtZMkp2Y2dBUkFCQ0FBQUNxQURpYmNSTmpNbkJoTG1oaGMyZ3VaR0YwWVFBQUFBQVlZekp6YUdubXJKek91TmlUMjlDYjd0ZUY0Z2NBQUFDQVkySnZjcVZqWVd4blpuTm9ZVEkxTm1Od1lXUk5BQUFBQUFBQUFBQUFBQUFBQUdSb1lYTm9XQ0FiMDV4SzZEUUxwbVE0NUNFS0s2dGNhdktqbGtuTjhjQXN4L0ZTa0FPV0VXUnVZVzFsYm1wMWJXSm1JRzFoYm1sbVpYTjBhbVY0WTJ4MWMybHZibk9Cb21WemRHRnlkQmlvWm14bGJtZDBhQmtlQkFBQUFqNXFkVzFpQUFBQUoycDFiV1JqTW1Oc0FCRUFFSUFBQUtvQU9KdHhBMk15Y0dFdVkyeGhhVzB1ZGpJQUFBQUNEMk5pYjNLbFkyRnNaMlp6YUdFeU5UWnBjMmxuYm1GMGRYSmxlRTF6Wld4bUkycDFiV0ptUFM5ak1uQmhMM1Z5Ympwak1uQmhPbUV4WW1Vd09UZGhMVFZqWmpjdE5EVTFPUzA0TkdZd0xUVXdPRGRoTldFek5USmtPQzlqTW5CaExuTnBaMjVoZEhWeVpXcHBibk4wWVc1alpVbEVlQ3g0YlhBNmFXbGtPbU0yTmpNNE1qUXdMV0UzT1dVdE5EY3hOeTFoWmpReExUSm1ZMkk1TjJRMU9HTXhaWEpqY21WaGRHVmtYMkZ6YzJWeWRHbHZibk9Eb21OMWNteDRMWE5sYkdZamFuVnRZbVk5WXpKd1lTNWhjM05sY25ScGIyNXpMMk15Y0dFdWFXNW5jbVZrYVdWdWRDNTJNMlJvWVhOb1dDQk5TS0N5OVo4TnRzVUFRTnYxOFA2VXhwb1NGdk0rREgyZ3U0UmZ6dWtNTGFKamRYSnNlQ3B6Wld4bUkycDFiV0ptUFdNeWNHRXVZWE56WlhKMGFXOXVjeTlqTW5CaExtRmpkR2x2Ym5NdWRqSmthR0Z6YUZnZzNJb21Tak5WZk1mMm1IQ0dZYmZHd3JMREphZWZBZ0RlZjZDc0hrNDE0UUtpWTNWeWJIZ3BjMlZzWmlOcWRXMWlaajFqTW5CaExtRnpjMlZ5ZEdsdmJuTXZZekp3WVM1b1lYTm9MbVJoZEdGa2FHRnphRmdnN1V3cDFacDNiUjNkakhkWlVxQnRWWUJYelpKdVgwNS9OUC9DN1M3dUo1aDBZMnhoYVcxZloyVnVaWEpoZEc5eVgybHVabStqWkc1aGJXVnZRVzUwYUhKdmNHbGpJRVpwYkdWelozWmxjbk5wYjI1bE1TNHdMakJyYzNCbFkxWmxjbk5wYjI1bE1pNDBMakFBQUJBNGFuVnRZZ0FBQUNocWRXMWtZekpqY3dBUkFCQ0FBQUNxQURpYmNRTmpNbkJoTG5OcFoyNWhkSFZ5WlFBQUFCQUlZMkp2Y3RLRVdRSVNvZ0VtR0NGWkFnb3dnZ0lHTUlJQmphQURBZ0VDQWhSQTVhQUs3c0k1MEw2NGcvb0dRZ1U5WjFVVEFEQUtCZ2dxaGtqT1BRUURBekJKTVJjd0ZRWURWUVFLRXc1QmJuUm9jbTl3YVdNc0lGQkNRekV1TUN3R0ExVUVBeE1sUVc1MGFISnZjR2xqSUVOdmJuUmxiblFnUTNKbFpHVnVkR2xoYkhNZ1VtOXZkQ0JEUVRBZUZ3MHlOakE0TURjeE9EUXpOVFphRncweU9EQTRNRFl4T1RRek5UWmFNRVF4RnpBVkJnTlZCQW9URGtGdWRHaHliM0JwWXl3Z1VFSkRNU2t3SndZRFZRUURFeUJCYm5Sb2NtOXdhV01nUTJ4aGRXUmxJRU52Ym5SbGJuUWdVMmxuYm1sdVp6QlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJKaDZDbXZMVUJnRkZOVTB2VUtsT1Z0RTZkamQxN0w1U3V3WDBMZW1GaXNCTTNka2QvM2N5anhGQTNRbzVTNDZmWDAvaWhZMFZaN21mYjlLRjcwM3Q1T2pXREJXTUE0R0ExVWREd0VCL3dRRUF3SUhnREFWQmdOVkhTVUVEakFNQmdvckJnRUVBWVBvWGdJQk1Bd0dBMVVkRXdFQi93UUNNQUF3SHdZRFZSMGpCQmd3Rm9BVXpsSGlCSUZPWkZzaitPUEV6NW8rbk1IWFhNSXdDZ1lJS29aSXpqMEVBd01EWndBd1pBSXdNWE1kRko0QmV0TExWWTdPUnVFOW5vcWJiQVpPWm4vYUFyWHlUd0ZBWmZLclB6eEYydlBvSk5mMStVQ2RnMVhHQWpCd1gxemQ5V0dxWWtxbUw1U0ZxdzFReVNqcjF6SmZwSk05KzFyZER3U1BMTU9QT2pLdWlYam9VL3BVVWVHOVJ3bWhZM0JoWkZrTm5nQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUFpZUU1VOVhDZ0NlbDgwaWFrR3dHOHVidGVML3Y5L3pTUjRkb0xlSGt3c2IrZzZ3dHJzMEt0b0ptbmwwRXBub091R3NJYmdzYTh6bnQ3Zk92UURBTS9PU0NrPTwvYzJwYTptYW5pZmVzdD48L21ldGFkYXRhPgogIDxkZWZzPjxtYXJrZXIgaWQ9ImEiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvLXN0YXJ0LXJldmVyc2UiPjxwYXRoIGQ9Ik0wIDBMMTAgNUwwIDEweiIgZmlsbD0iIzMzNDE1NSIvPjwvbWFya2VyPjwvZGVmcz4KICA8cmVjdCB4PSIxMCIgeT0iNjAiIHdpZHRoPSIyNDAiIGhlaWdodD0iMTcwIiByeD0iMTYiIGZpbGw9IiNlMGYyZmUiIHN0cm9rZT0iIzAzNjlhMSIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPHRleHQgeD0iMTMwIiB5PSIxMDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMwYzRhNmUiPkRpc2NvIGR1cm88L3RleHQ+CiAgPHRleHQgeD0iMTMwIiB5PSIxMzgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTkiIGZpbGw9IiMwYzRhNmUiPmFsbWFjZW5hbWllbnRvPC90ZXh0PgogIDx0ZXh0IHg9IjEzMCIgeT0iMTY1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE5IiBmaWxsPSIjMGM0YTZlIj5ncmFuZGUgwrcgbGVudG88L3RleHQ+CiAgPHRleHQgeD0iMTMwIiB5PSIxOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTkiIGZpbGw9IiMwYzRhNmUiPnBlcnNpc3RlbnRlPC90ZXh0PgogIDx0ZXh0IHg9IjEzMCIgeT0iMjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE1IiBmaWxsPSIjNDc1NTY5Ij4oZW4gY2xhc2U6IMKrUk9NwrspPC90ZXh0PgogIDxyZWN0IHg9IjMzMCIgeT0iNjAiIHdpZHRoPSIyNDAiIGhlaWdodD0iMTcwIiByeD0iMTYiIGZpbGw9IiNkY2ZjZTciIHN0cm9rZT0iIzE1ODAzZCIgc3Ryb2tlLXdpZHRoPSIzIi8+CiAgPHRleHQgeD0iNDUwIiB5PSIxMDUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjYiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMxNDUzMmQiPlJBTTwvdGV4dD4KICA8dGV4dCB4PSI0NTAiIHk9IjEzOCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzE0NTMyZCI+bWVtb3JpYSBkZSB0cmFiYWpvPC90ZXh0PgogIDx0ZXh0IHg9IjQ1MCIgeT0iMTY1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE5IiBmaWxsPSIjMTQ1MzJkIj5wZXF1ZcOxYSDCtyByw6FwaWRhPC90ZXh0PgogIDx0ZXh0IHg9IjQ1MCIgeT0iMTkyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE5IiBmaWxsPSIjMTQ1MzJkIj52b2zDoXRpbDwvdGV4dD4KICA8cmVjdCB4PSI2NTAiIHk9IjYwIiB3aWR0aD0iMjQwIiBoZWlnaHQ9IjE3MCIgcng9IjE2IiBmaWxsPSIjZmVmM2M3IiBzdHJva2U9IiNiNDUzMDkiIHN0cm9rZS13aWR0aD0iMyIvPgogIDx0ZXh0IHg9Ijc3MCIgeT0iMTA1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI2IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjNzgzNTBmIj5Qcm9jZXNhZG9yPC90ZXh0PgogIDx0ZXh0IHg9Ijc3MCIgeT0iMTM4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE5IiBmaWxsPSIjNzgzNTBmIj5sZWUsIGNhbGN1bGEsIGVzY3JpYmU8L3RleHQ+CiAgPHRleHQgeD0iNzcwIiB5PSIxNjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTkiIGZpbGw9IiM3ODM1MGYiPnZlbG9jaWRhZCBlbiBHSHo8L3RleHQ+CiAgPHRleHQgeD0iNzcwIiB5PSIxOTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTkiIGZpbGw9IiM3ODM1MGYiPihuw7pjbGVvcyAvIHRocmVhZHMpPC90ZXh0PgogIDxsaW5lIHgxPSIyNTIiIHkxPSIxNDUiIHgyPSIzMjgiIHkyPSIxNDUiIHN0cm9rZT0iIzMzNDE1NSIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2EpIiBtYXJrZXItc3RhcnQ9InVybCgjYSkiLz4KICA8bGluZSB4MT0iNTcyIiB5MT0iMTQ1IiB4Mj0iNjQ4IiB5Mj0iMTQ1IiBzdHJva2U9IiMzMzQxNTUiIHN0cm9rZS13aWR0aD0iNCIgbWFya2VyLWVuZD0idXJsKCNhKSIgbWFya2VyLXN0YXJ0PSJ1cmwoI2EpIi8+CiAgPHRleHQgeD0iMjkwIiB5PSIxMjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZpbGw9IiMzMzQxNTUiPmNhcmdhPC90ZXh0PgogIDx0ZXh0IHg9IjYxMCIgeT0iMTI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE1IiBmaWxsPSIjMzM0MTU1Ij5vcGVyYTwvdGV4dD4KPC9zdmc+Cg==" width="880" alt=""></p>
+<ul>
+<li>El <strong>procesador</strong> lee datos, opera con ellos y los vuelve a escribir.</li>
+<li>Más <strong>GHz / núcleos</strong> ⇒ más operaciones por segundo.</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">6</span></section>
+<section class="" data-i="7"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>¿Cómo trabaja el ordenador con un archivo?</h1>
+<ol>
+<li>El archivo <strong>reposa en el disco</strong> (grande, lento, no se pierde al apagar).</li>
+<li>El procesador <strong>carga en RAM</strong> lo que va a usar muchas veces (pequeña, rápida).</li>
+<li>Opera sobre ello y <strong>escribe</strong> el resultado.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Necesito…</th>
+<th>Priorizo…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Guardar muchos datos a largo plazo</td>
+<td><strong>Disco</strong> grande</td>
+</tr>
+<tr>
+<td>Procesar mucha información a la vez (alinear, ensamblar)</td>
+<td><strong>RAM</strong> abundante</td>
+</tr>
+<tr>
+<td>Hacer cálculos muy rápido</td>
+<td><strong>Procesador</strong> potente</td>
+</tr>
+</tbody>
+</table>
+<p><em>Analogía:</em> disco = <strong>archivo</strong> de la oficina · RAM = <strong>mesa de trabajo</strong> · procesador = <strong>persona</strong> que trabaja.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">7</span></section>
+<section class="" data-i="8"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Bit y byte</h1>
+<ul>
+<li>Todo el hardware se reduce a celdas con <strong>dos estados</strong>: apagado / encendido → <strong>0 / 1</strong> = <strong>1 bit</strong>.</li>
+<li><strong>8 bits = 1 byte</strong> → 2⁸ = <strong>256</strong> combinaciones posibles.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Unidad</th>
+<th>Equivale a</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1 byte (B)</td>
+<td>8 bits</td>
+</tr>
+<tr>
+<td>1 KB</td>
+<td>~ 1 000 bytes</td>
+</tr>
+<tr>
+<td>1 MB</td>
+<td>~ 1 000 KB</td>
+</tr>
+<tr>
+<td>1 GB</td>
+<td>~ 1 000 MB</td>
+</tr>
+<tr>
+<td>1 TB</td>
+<td>~ 1 000 GB</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Con 8 bits hay 256 estados; con 16 bits, 65 536; con 24 bits, <strong>16 777 216</strong>.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">8</span></section>
+<section class="" data-i="9"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Los números en binario</h1>
+<p>Se cuenta desde la <strong>derecha</strong>: cada posición vale el doble que la anterior.</p>
+<table>
+<thead>
+<tr>
+<th>Binario</th>
+<th>Decimal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>00000000</code></td>
+<td>0</td>
+</tr>
+<tr>
+<td><code>00000001</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>00000010</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>00000011</code></td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>00000100</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>01000001</code></td>
+<td>65</td>
+</tr>
+</tbody>
+</table>
+<p><em>(posiciones: 128 · 64 · 32 · 16 · 8 · 4 · 2 · 1 → <code>01000001</code> = 64 + 1 = 65)</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">9</span></section>
+<section class="" data-i="10"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>El texto: ASCII y UTF-8</h1>
+<ul>
+<li>ASCII asigna a cada <strong>carácter</strong> un número, guardado en 1 byte.</li>
+<li>Existe una <strong>tabla</strong> que se puede consultar.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Carácter</th>
+<th>Número</th>
+<th>Byte</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>A</code></td>
+<td>65</td>
+<td><code>01000001</code></td>
+</tr>
+<tr>
+<td><code>C</code></td>
+<td>67</td>
+<td><code>01000011</code></td>
+</tr>
+<tr>
+<td><code>G</code></td>
+<td>71</td>
+<td><code>01000111</code></td>
+</tr>
+<tr>
+<td><code>T</code></td>
+<td>84</td>
+<td><code>01010100</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>UTF-8 / Unicode</strong>: extensiones que permiten acentos, <code>ñ</code>, alfabetos no latinos…</li>
+<li>Un archivo de <strong>texto plano</strong> = una secuencia de bytes que se traducen con esta tabla.</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">10</span></section>
+<section class="" data-i="11"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>¿Cuánto ocupa un genoma?</h1>
+<p>Una base (<code>A</code>, <code>C</code>, <code>G</code>, <code>T</code>) como carácter ASCII ocupa <strong>1 byte</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Cálculo</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Genoma humano ≈ 3 100 000 000 bases × 1 byte</td>
+<td><strong>≈ 3,1 GB</strong> en texto plano</td>
+</tr>
+<tr>
+<td>Solo hay 4 letras ⇒ bastan <strong>2 bits</strong> por base</td>
+<td><strong>≈ 0,8 GB</strong> si se empaqueta</td>
+</tr>
+</tbody>
+</table>
+<p>Por eso existen formatos <strong>comprimidos</strong> (<code>.gz</code>, <code>.bam</code>, <code>.cram</code>…): la misma información, menos bytes.</p>
+<blockquote>
+<p><em>Pregunta:</em> ¿y si queremos guardar además la <strong>calidad</strong> de cada base? (lo veremos en FASTQ)</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">11</span></section>
+<section class="" data-i="12"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Las imágenes: color RGB</h1>
+<ul>
+<li>Cada <strong>píxel</strong> = 3 bytes: intensidad de <strong>R</strong>ojo, <strong>G</strong>reen (verde), <strong>B</strong>lue (azul).</li>
+<li>Cada byte: 0 – 255 → 256 × 256 × 256 = <strong>16 777 216</strong> colores.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Color</th>
+<th>R</th>
+<th>G</th>
+<th>B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Rojo puro</td>
+<td>255</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Verde puro</td>
+<td>0</td>
+<td>255</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Blanco</td>
+<td>255</td>
+<td>255</td>
+<td>255</td>
+</tr>
+<tr>
+<td>Negro</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>Otras codificaciones: <strong>CMYK</strong> (4 canales, impresión).</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">12</span></section>
+<section class="" data-i="13"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Cada tipo de archivo = una codificación distinta</h1>
+<ul>
+<li><code>.pdf</code>, <code>.docx</code>, <code>.xlsx</code>, <code>.pptx</code>, <code>.html</code>, <code>.mp3</code>, <code>.zip</code>, <code>.fastq</code>, <code>.sam</code>… cada uno guarda sus bytes <strong>a su manera</strong>.</li>
+<li>Un <code>.docx</code> guarda texto <strong>y</strong> tipo de letra, negritas, tablas… ⇒ su estructura es compleja.</li>
+<li>Para <strong>leer</strong> un archivo hay que <strong>entender su codificación</strong> (o usar el programa que la conoce).</li>
+</ul>
+<blockquote>
+<p>Los archivos de la práctica (<code>.fastq</code>, <code>.sam</code>, <code>.txt</code>) son <strong>texto plano</strong>: los podemos leer con <code>cat</code> o <code>less</code>. El <code>.docx</code> <strong>no</strong>.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">13</span></section>
+<section class="" data-i="14"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>La extensión NO cambia el archivo</h1>
+<ul>
+<li>La extensión (<code>.pdf</code>, <code>.zip</code>…) es <strong>solo parte del nombre</strong>: una pista para el usuario y el sistema.</li>
+<li>Se puede cambiar, quitar o inventar <strong>sin tocar el contenido</strong>.</li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Si hago…</th>
+<th>Resultado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Renombrar <code>informe.docx</code> → <code>informe.doc</code></td>
+<td>❌ <strong>No</strong> convierte el formato; solo despista al sistema</td>
+</tr>
+<tr>
+<td>«Guardar como…» <code>.doc</code> en Word</td>
+<td>✔ <strong>Sí</strong> recodifica los bytes</td>
+</tr>
+</tbody>
+</table>
+<p><em>Demostración (ejercicio 1.2):</em> <code>less Tema1.1.docx</code> ⇒ ¡galimatías! No es ASCII.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">14</span></section>
+<section class="" data-i="15"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>md5: la huella digital de un archivo</h1>
+<ul>
+<li>Función matemática sobre <strong>todos los bytes</strong> del archivo ⇒ un código de 32 caracteres.</li>
+<li><strong>Mismo contenido ⇒ mismo md5</strong>, aunque cambie el <strong>nombre</strong> o el ordenador.</li>
+<li>Cambia <strong>un solo bit</strong> ⇒ md5 completamente distinto.</li>
+</ul>
+<pre><code class="language-console">$ md5sum Sample1.sam Sample4.sam
+49ce938477a0efcb2c5fcc14c88ab7dd  Sample1.sam
+49ce938477a0efcb2c5fcc14c88ab7dd  Sample4.sam
+</code></pre>
+<p><strong>Usos:</strong> comprobar que una <strong>descarga/copia</strong> llegó íntegra · detectar <strong>duplicados</strong> con otro nombre.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">15</span></section>
+<section class="lead" data-i="16"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Bloque B</h1>
+<h2>Sistemas operativos y organización de archivos</h2>
+<p><em>(minutos 30 – 45)</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">16</span></section>
+<section class="" data-i="17"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>El sistema operativo: el «director de orquesta»</h1>
+<ul>
+<li>Programa que <strong>gestiona</strong> procesador, memoria, discos y periféricos.</li>
+<li>Sobre él se instalan las <strong>aplicaciones</strong>, que le piden recursos.</li>
+</ul>
+<pre><code class="language-text"> Usuario  ──►  Aplicaciones  ──►  SISTEMA OPERATIVO  ──►  Hardware
+ (tú)          (R, BWA, Word…)    (Linux, Windows…)       (CPU · RAM · disco)
+</code></pre>
+<p>Sin sistema operativo, cada programa tendría que saber manejar el disco, la memoria y la pantalla por su cuenta.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">17</span></section>
+<section class="" data-i="18"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Dos grandes familias</h1>
+<table>
+<thead>
+<tr>
+<th>Familia</th>
+<th>Sistemas</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Windows</strong> (Microsoft)</td>
+<td>Windows XP, 7, 10, 11…</td>
+</tr>
+<tr>
+<td><strong>Unix</strong> y derivados</td>
+<td><strong>Linux</strong> (Ubuntu, Debian…), <strong>macOS</strong>, <strong>Android</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Ambas organizan los archivos en <strong>carpetas (directorios)</strong>, con sintaxis distinta.</li>
+<li>En este curso usaremos <strong>Unix/Linux</strong>:
+  1. Es <strong>el más usado</strong> en análisis bioinformáticos y donde están <strong>más herramientas</strong>.
+  2. Probablemente es el que <strong>menos conocéis</strong> ⇒ más valor práctico.</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">18</span></section>
+<section class="" data-i="19"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Rutas: Windows vs Unix</h1>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Windows</th>
+<th>Unix / Linux</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Raíz</td>
+<td><code>C:\</code> (letra de unidad)</td>
+<td><code>/</code></td>
+</tr>
+<tr>
+<td>Separador</td>
+<td><code>\</code> (barra <strong>invertida</strong>)</td>
+<td><code>/</code> (barra <strong>normal</strong>)</td>
+</tr>
+<tr>
+<td>Ejemplo</td>
+<td><code>C:\Datos\Laborales\x.txt</code></td>
+<td><code>/home/ana/datos/x.txt</code></td>
+</tr>
+<tr>
+<td>Mayúsculas</td>
+<td>no distingue</td>
+<td><strong>sí distingue</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>C:</code> es el disco duro por herencia histórica: <code>A:</code> y <code>B:</code> estaban reservadas a los <strong>disquetes</strong>.</li>
+<li>En Linux no hay letras: todo cuelga de un <strong>único árbol</strong> que empieza en <code>/</code>.</li>
+</ul>
+<blockquote>
+<p>⚠️ En Linux <code>Datos</code> ≠ <code>datos</code> ≠ <code>DATOS</code>.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">19</span></section>
+<section class="" data-i="20"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>El árbol de directorios de Linux</h1>
+<pre><code class="language-text">/                      ← raíz
+├── home/              ← carpetas personales
+│   └── alumno/        ← tu &quot;carpeta de usuario&quot;  (~)
+│       └── Tema1/     ← la carpeta de la práctica
+│           ├── Secuencias.txt
+│           └── Datos/      ← la crearemos nosotros
+├── bin/  usr/         ← programas del sistema
+├── etc/               ← configuración
+└── media/  mnt/       ← discos y memorias USB conectados
+</code></pre>
+<p>Cada <code>/</code> baja <strong>un nivel</strong> en el árbol.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">20</span></section>
+<section class="" data-i="21"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Rutas absolutas y relativas</h1>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Significa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/</code> (al principio)</td>
+<td>la <strong>raíz</strong> ⇒ ruta <strong>absoluta</strong></td>
+</tr>
+<tr>
+<td><code>.</code></td>
+<td>la carpeta <strong>actual</strong></td>
+</tr>
+<tr>
+<td><code>..</code></td>
+<td>la carpeta <strong>superior</strong> (un nivel arriba)</td>
+</tr>
+<tr>
+<td><code>~</code></td>
+<td>tu carpeta personal</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">/home/alumno/Tema1/Secuencias.txt     # absoluta: valga donde valga
+Secuencias.txt                        # relativa: desde Tema1
+./Secuencias.txt                      # lo mismo, explícito
+../Secuencias.txt                     # desde Tema1/Datos
+</code></pre>
+<blockquote>
+<p>Esta idea de <code>../</code> es la clave del <strong>ejercicio 8</strong>.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">21</span></section>
+<section class="" data-i="22"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Interfaz gráfica vs terminal</h1>
+<ul>
+<li>Al hacer <em>clic derecho → copiar</em>, la interfaz gráfica <strong>traduce</strong> tu clic en una orden <code>cp origen destino</code>.</li>
+<li>Alguien tuvo que <strong>programar</strong> cada opción del menú.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Interfaz gráfica</th>
+<th>Terminal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Intuitiva al empezar</td>
+<td>✔</td>
+<td>✘ (curva inicial)</td>
+</tr>
+<tr>
+<td>Todas las operaciones disponibles</td>
+<td>✘</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Automatizable / reproducible</td>
+<td>✘</td>
+<td>✔</td>
+</tr>
+<tr>
+<td>Funciona en servidores remotos</td>
+<td>✘</td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
+<p><em>Todo lo que hace la interfaz gráfica se puede hacer en la terminal… pero no al revés.</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">22</span></section>
+<section class="lead" data-i="23"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Bloque C</h1>
+<h2>La terminal</h2>
+<p><em>(minutos 45 – 75)</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">23</span></section>
+<section class="" data-i="24"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Anatomía de un comando</h1>
+<pre><code class="language-text"> programa   opciones           argumentos
+    │          │                   │
+    ▼          ▼                   ▼
+   bwa mem  -t 4   idx_base   in1.fq  [in2.fq]
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Qué es</th>
+<th>En la ayuda</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Programa</strong></td>
+<td>qué se ejecuta</td>
+<td><code>bwa mem</code></td>
+</tr>
+<tr>
+<td><strong>Opciones</strong></td>
+<td>modifican el comportamiento (casi siempre <strong>opcionales</strong>, con valor por defecto)</td>
+<td><code>[-t INT]</code></td>
+</tr>
+<tr>
+<td><strong>Argumentos</strong></td>
+<td>datos que necesita (obligatorios)</td>
+<td><code>&lt;idxbase&gt; &lt;in1.fq&gt;</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>Los corchetes <code>[ ]</code> indican «opcional».</em> Por defecto <code>bwa</code> usa <strong>1 hilo</strong>; con <code>-t 4</code>, cuatro.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">24</span></section>
+<section class="" data-i="25"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Pedir ayuda: la habilidad más importante</h1>
+<pre><code class="language-bash">mkdir --help      # resumen de uso
+mkdir -h          # (en muchos programas)
+man mkdir         # el manual completo  (salir con  q)
+mkdir             # sin argumentos: muchos programas muestran el uso
+</code></pre>
+<ol>
+<li>Lee <strong>Usage</strong> / <em>SYNOPSIS</em>: ¿qué es obligatorio y qué opcional?</li>
+<li>Busca la <strong>opción</strong> que necesitas (<code>-s</code>, <code>-n</code>, <code>-l</code>…).</li>
+<li>Prueba en un archivo <strong>de ejemplo</strong>, nunca en tus datos originales.</li>
+</ol>
+<blockquote>
+<p>Todos los comandos de hoy los descubriremos así, no de memoria.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">25</span></section>
+<section class="" data-i="26"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Navegar y gestionar archivos</h1>
+<table>
+<thead>
+<tr>
+<th>Comando</th>
+<th>Significa</th>
+<th>Ejemplo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pwd</code></td>
+<td><em>print working directory</em></td>
+<td><code>pwd</code></td>
+</tr>
+<tr>
+<td><code>ls</code></td>
+<td><em>list</em></td>
+<td><code>ls -l</code></td>
+</tr>
+<tr>
+<td><code>cd</code></td>
+<td><em>change directory</em></td>
+<td><code>cd Tema1</code></td>
+</tr>
+<tr>
+<td><code>mkdir</code></td>
+<td><em>make directory</em></td>
+<td><code>mkdir Datos</code></td>
+</tr>
+<tr>
+<td><code>cp</code></td>
+<td><em>copy</em></td>
+<td><code>cp a.txt Datos/</code></td>
+</tr>
+<tr>
+<td><code>mv</code></td>
+<td><em>move</em> / renombrar</td>
+<td><code>mv a.txt b.txt</code></td>
+</tr>
+<tr>
+<td><code>rm</code></td>
+<td><em>remove</em></td>
+<td><code>rm b.txt</code></td>
+</tr>
+<tr>
+<td><code>ln -s</code></td>
+<td><em>link</em> simbólico</td>
+<td><code>ln -s ../a.txt a.txt</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <code>rm</code> <strong>no tiene papelera</strong>. Lo borrado no vuelve.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">26</span></section>
+<section class="" data-i="27"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Una sesión de ejemplo</h1>
+<pre><code class="language-console">alumno@lab:~$ pwd
+/home/alumno
+alumno@lab:~$ ls
+Tema1
+alumno@lab:~$ cd Tema1
+alumno@lab:~/Tema1$ mkdir Datos
+alumno@lab:~/Tema1$ cp Secuencias.txt Datos/
+alumno@lab:~/Tema1$ ls Datos
+Secuencias.txt
+</code></pre>
+<p>El <strong>prompt</strong> <code>alumno@lab:~/Tema1$</code> te dice <strong>dónde estás</strong>.</p>
+<ul>
+<li><code>cp</code> y <code>mv</code>: <strong>origen</strong> primero, <strong>destino</strong> después.</li>
+<li>Si el destino es una carpeta, el archivo conserva su nombre.</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">27</span></section>
+<section class="" data-i="28"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Leer el contenido de un archivo</h1>
+<table>
+<thead>
+<tr>
+<th>Comando</th>
+<th>Qué hace</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cat f</code></td>
+<td>vuelca <strong>todo</strong> de una vez (no interactivo)</td>
+</tr>
+<tr>
+<td><code>more f</code></td>
+<td>por pantallas, <strong>solo hacia abajo</strong></td>
+</tr>
+<tr>
+<td><code>less f</code></td>
+<td>por pantallas, <strong>arriba y abajo</strong> · salir con <code>q</code></td>
+</tr>
+<tr>
+<td><code>head -n 50 f</code></td>
+<td>las <strong>primeras</strong> 50 líneas</td>
+</tr>
+<tr>
+<td><code>tail -n 50 f</code></td>
+<td>las <strong>últimas</strong> 50 líneas</td>
+</tr>
+<tr>
+<td><code>wc -l f</code></td>
+<td>cuenta las <strong>líneas</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Con archivos de varios GB, <strong>nunca</strong> uses <code>cat</code>: usa <code>less</code>, <code>head</code> o <code>tail</code>.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">28</span></section>
+<section class="" data-i="29"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Enlaces simbólicos: copia ≠ enlace</h1>
+<pre><code class="language-bash">cp  Secuencias.txt  Datos/copia.txt            # COPIA: archivo nuevo e independiente
+ln -s ../Secuencias.txt  Datos/Secuencias.txt  # ENLACE: un atajo al original
+</code></pre>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Copia</th>
+<th>Enlace simbólico</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ocupa espacio</td>
+<td>Sí (duplica)</td>
+<td>Casi nada</td>
+</tr>
+<tr>
+<td>Si edito el original</td>
+<td><strong>no</strong> se entera</td>
+<td><strong>sí</strong> lo ve</td>
+</tr>
+<tr>
+<td>Si borro el original</td>
+<td>sigue existiendo</td>
+<td>queda <strong>roto</strong></td>
+</tr>
+<tr>
+<td>En <code>ls -l</code></td>
+<td><code>-rw-r--r--</code></td>
+<td><code>lrwxrwxrwx … -&gt; ../Secuencias.txt</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>Útil en bioinformática:</em> un genoma de referencia de 3 GB, <strong>sin duplicarlo</strong> en cada proyecto.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">29</span></section>
+<section class="" data-i="30"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Permisos de archivos</h1>
+<p><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgMjYwIiBmb250LWZhbWlseT0iTWVubG8sIENvbnNvbGFzLCBtb25vc3BhY2UiIHhtbG5zOmMycGE9Imh0dHA6Ly9jMnBhLm9yZy9tYW5pZmVzdCI+PG1ldGFkYXRhPjxjMnBhOm1hbmlmZXN0PkFBQVdnbXAxYldJQUFBQWVhblZ0WkdNeWNHRUFFUUFRZ0FBQXFnQTRtM0VEWXpKd1lRQUFBQlpjYW5WdFlnQUFBRWRxZFcxa1l6SnRZUUFSQUJDQUFBQ3FBRGliY1FOMWNtNDZZekp3WVRwak1tUTVaR1E0TWkxa05UaGtMVFJtWkRVdE9HVmlNeTAwWkRZM01USXlOemMzTURJQUFBQURsMnAxYldJQUFBQXBhblZ0WkdNeVlYTUFFUUFRZ0FBQXFnQTRtM0VEWXpKd1lTNWhjM05sY25ScGIyNXpBQUFBQUx4cWRXMWlBQUFBUkdwMWJXUmpZbTl5QUJFQUVJQUFBS29BT0p0eEUyTXljR0V1YVc1bmNtVmthV1Z1ZEM1Mk13QUFBQUFZWXpKemFIRzZpcGUrUDhLR2ZvcDgzTDZHN3p3QUFBQndZMkp2Y3FOcFpHTTZabTl5YldGMGJXbHRZV2RsTDNOMlp5dDRiV3hxYVc1emRHRnVZMlZKUkhnc2VHMXdPbWxwWkRvMU5EZzVaV0kxTlMxbU1UUmhMVFF6TVRrdE9ETmlZaTAzWm1RelpUQTBOV00zWXpKc2NtVnNZWFJwYjI1emFHbHdhSEJoY21WdWRFOW1BQUFCNG1wMWJXSUFBQUJCYW5WdFpHTmliM0lBRVFBUWdBQUFxZ0E0bTNFVFl6SndZUzVoWTNScGIyNXpMbll5QUFBQUFCaGpNbk5vRGcwRHd6TXM0ZXk1UTlBakorWWhqd0FBQVpsalltOXlvbWRoWTNScGIyNXpncUptWVdOMGFXOXVhMk15Y0dFdWIzQmxibVZrYW5CaGNtRnRaWFJsY25PaGEybHVaM0psWkdsbGJuUnpnYUpqZFhKc2VDMXpaV3htSTJwMWJXSm1QV015Y0dFdVlYTnpaWEowYVc5dWN5OWpNbkJoTG1sdVozSmxaR2xsYm5RdWRqTmthR0Z6YUZnZ3N0Y1Q1Yms0Zk02TEpJakJLRzZ5ajF6dG95cks4Q2JUTjZEZ2FleHBCYzZrWm1GamRHbHZibmdkWTI5dExtRnVkR2h5YjNCcFl5NWpiR0YxWkdVdWNISnZkbWxrWldScWNHRnlZVzFsZEdWeWM2RjRIMk52YlM1aGJuUm9jbTl3YVdNdWIzSnBaMmx1TFdOdmJtWnBaR1Z1WTJWbmRXNXJibTkzYm10a1pYTmpjbWx3ZEdsdmJuaG1RMnhoZFdSbElIQnliM1pwWkdWa0lIUm9hWE1nWm1sc1pTQmhkQ0IwYUdVZ2NtVnhkV1Z6ZENCdlppQmhJSFZ6WlhJZ1lXNWtJRzFoZVNCb1lYWmxJR055WldGMFpXUWdiM0lnYlc5a2FXWnBaV1FnZEdobElHWnBiR1VnWTI5dWRHVnVkSE11YlhOdlpuUjNZWEpsUVdkbGJuU2haRzVoYldWbVEyeGhkV1JsY21Gc2JFRmpkR2x2Ym5OSmJtTnNkV1JsWlBVQUFBRElhblZ0WWdBQUFFQnFkVzFrWTJKdmNnQVJBQkNBQUFDcUFEaWJjUk5qTW5CaExtaGhjMmd1WkdGMFlRQUFBQUFZWXpKemFQUm5RZnBRUHd1UnB1SU0rNkU2czlrQUFBQ0FZMkp2Y3FWallXeG5abk5vWVRJMU5tTndZV1JOQUFBQUFBQUFBQUFBQUFBQUFHUm9ZWE5vV0NCak1aQ3Y5OURDakFIYjFtUlpib2hTZ0ovQmd6V0NlcHp2SVcrazhTdVpxbVJ1WVcxbGJtcDFiV0ptSUcxaGJtbG1aWE4wYW1WNFkyeDFjMmx2Ym5PQm9tVnpkR0Z5ZEJpbVpteGxibWQwYUJrZUJBQUFBajVxZFcxaUFBQUFKMnAxYldSak1tTnNBQkVBRUlBQUFLb0FPSnR4QTJNeWNHRXVZMnhoYVcwdWRqSUFBQUFDRDJOaWIzS2xZMkZzWjJaemFHRXlOVFpwYzJsbmJtRjBkWEpsZUUxelpXeG1JMnAxYldKbVBTOWpNbkJoTDNWeWJqcGpNbkJoT21NeVpEbGtaRGd5TFdRMU9HUXROR1prTlMwNFpXSXpMVFJrTmpjeE1qSTNOemN3TWk5ak1uQmhMbk5wWjI1aGRIVnlaV3BwYm5OMFlXNWpaVWxFZUN4NGJYQTZhV2xrT2pZMU56TXlOVEk1TFdFMVpqa3RORGM0TlMxaFpHTTNMVGt3Wmpnd09EWmhOMll4TVhKamNtVmhkR1ZrWDJGemMyVnlkR2x2Ym5PRG9tTjFjbXg0TFhObGJHWWphblZ0WW1ZOVl6SndZUzVoYzNObGNuUnBiMjV6TDJNeWNHRXVhVzVuY21Wa2FXVnVkQzUyTTJSb1lYTm9XQ0N5MXhQbHVUaDh6b3NraU1Fb2JyS1BYTzJqS3Nyd0p0TTNvT0JwN0drRnpxSmpkWEpzZUNwelpXeG1JMnAxYldKbVBXTXljR0V1WVhOelpYSjBhVzl1Y3k5ak1uQmhMbUZqZEdsdmJuTXVkakprYUdGemFGZ2d6K1VkamNRaEpleFo0bFNaWUJvTmcrRHNmWHoycEhPcVNXZTNlSTN4QzFhaVkzVnliSGdwYzJWc1ppTnFkVzFpWmoxak1uQmhMbUZ6YzJWeWRHbHZibk12WXpKd1lTNW9ZWE5vTG1SaGRHRmthR0Z6YUZnZ0FnUU9tZHNmaDNhbGFrNytESTRQaHo2Q1FBNVR1emxkTFFOeTR4U0pUYjkwWTJ4aGFXMWZaMlZ1WlhKaGRHOXlYMmx1Wm0ralpHNWhiV1Z2UVc1MGFISnZjR2xqSUVacGJHVnpaM1psY25OcGIyNWxNUzR3TGpCcmMzQmxZMVpsY25OcGIyNWxNaTQwTGpBQUFCQTRhblZ0WWdBQUFDaHFkVzFrWXpKamN3QVJBQkNBQUFDcUFEaWJjUU5qTW5CaExuTnBaMjVoZEhWeVpRQUFBQkFJWTJKdmN0S0VXUUlTb2dFbUdDRlpBZ293Z2dJR01JSUJqYUFEQWdFQ0FoUkE1YUFLN3NJNTBMNjRnL29HUWdVOVoxVVRBREFLQmdncWhrak9QUVFEQXpCSk1SY3dGUVlEVlFRS0V3NUJiblJvY205d2FXTXNJRkJDUXpFdU1Dd0dBMVVFQXhNbFFXNTBhSEp2Y0dsaklFTnZiblJsYm5RZ1EzSmxaR1Z1ZEdsaGJITWdVbTl2ZENCRFFUQWVGdzB5TmpBNE1EY3hPRFF6TlRaYUZ3MHlPREE0TURZeE9UUXpOVFphTUVReEZ6QVZCZ05WQkFvVERrRnVkR2h5YjNCcFl5d2dVRUpETVNrd0p3WURWUVFERXlCQmJuUm9jbTl3YVdNZ1EyeGhkV1JsSUVOdmJuUmxiblFnVTJsbmJtbHVaekJaTUJNR0J5cUdTTTQ5QWdFR0NDcUdTTTQ5QXdFSEEwSUFCSmg2Q212TFVCZ0ZGTlUwdlVLbE9WdEU2ZGpkMTdMNVN1d1gwTGVtRmlzQk0zZGtkLzNjeWp4RkEzUW81UzQ2ZlgwL2loWTBWWjdtZmI5S0Y3MDN0NU9qV0RCV01BNEdBMVVkRHdFQi93UUVBd0lIZ0RBVkJnTlZIU1VFRGpBTUJnb3JCZ0VFQVlQb1hnSUJNQXdHQTFVZEV3RUIvd1FDTUFBd0h3WURWUjBqQkJnd0ZvQVV6bEhpQklGT1pGc2orT1BFejVvK25NSFhYTUl3Q2dZSUtvWkl6ajBFQXdNRFp3QXdaQUl3TVhNZEZKNEJldExMVlk3T1J1RTlub3FiYkFaT1puL2FBclh5VHdGQVpmS3JQenhGMnZQb0pOZjErVUNkZzFYR0FqQndYMXpkOVdHcVlrcW1MNVNGcXcxUXlTanIxekpmcEpNOSsxcmREd1NQTE1PUE9qS3VpWGpvVS9wVVVlRzlSd21oWTNCaFpGa05uZ0FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQVBaWVFMVitYVUUxYVJQSE1nTXFlbU4xNGRKVDZOY2FDZHJoaFdRZGJRdzZyNmI5MWZmWm5MVmNkcUJhK2wySkV0WGYzOFArdTNEazRRNDZTcUV5Q1pDbWIzND08L2MycGE6bWFuaWZlc3Q+PC9tZXRhZGF0YT4KICA8dGV4dCB4PSI0NTAiIHk9IjcwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjY0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMGYxNzJhIiBsZXR0ZXItc3BhY2luZz0iNiI+LXJ3LXItLXItLTwvdGV4dD4KICA8ZyBmb250LWZhbWlseT0iSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+CiAgICA8cmVjdCB4PSIxNDciIHk9Ijk1IiB3aWR0aD0iNDYiIGhlaWdodD0iNSIgZmlsbD0iIzY0NzQ4YiIvPjx0ZXh0IHg9IjE3MCIgeT0iMTMwIiBmaWxsPSIjMzM0MTU1Ij50aXBvPC90ZXh0Pjx0ZXh0IHg9IjE3MCIgeT0iMTU0IiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjE1Ij4tIGFyY2hpdm88L3RleHQ+PHRleHQgeD0iMTcwIiB5PSIxNzQiIGZpbGw9IiM2NDc0OGIiIGZvbnQtc2l6ZT0iMTUiPmQgY2FycGV0YTwvdGV4dD48dGV4dCB4PSIxNzAiIHk9IjE5NCIgZmlsbD0iIzY0NzQ4YiIgZm9udC1zaXplPSIxNSI+bCBlbmxhY2U8L3RleHQ+CiAgICA8cmVjdCB4PSIyMTUiIHk9Ijk1IiB3aWR0aD0iMTMwIiBoZWlnaHQ9IjUiIGZpbGw9IiMwMzY5YTEiLz48dGV4dCB4PSIyODAiIHk9IjEzMCIgZmlsbD0iIzBjNGE2ZSIgZm9udC13ZWlnaHQ9IjcwMCI+dXN1YXJpbyAodSk8L3RleHQ+PHRleHQgeD0iMjgwIiB5PSIxNTQiIGZpbGw9IiMwYzRhNmUiIGZvbnQtc2l6ZT0iMTUiPmVsIGR1ZcOxbzwvdGV4dD48dGV4dCB4PSIyODAiIHk9IjE3NCIgZmlsbD0iIzBjNGE2ZSIgZm9udC1zaXplPSIxNSI+cnctID0gbGVlciArIGVzY3JpYmlyPC90ZXh0PgogICAgPHJlY3QgeD0iMzUwIiB5PSI5NSIgd2lkdGg9IjEzMCIgaGVpZ2h0PSI1IiBmaWxsPSIjMTU4MDNkIi8+PHRleHQgeD0iNDE1IiB5PSIxMzAiIGZpbGw9IiMxNDUzMmQiIGZvbnQtd2VpZ2h0PSI3MDAiPmdydXBvIChnKTwvdGV4dD48dGV4dCB4PSI0MTUiIHk9IjE1NCIgZmlsbD0iIzE0NTMyZCIgZm9udC1zaXplPSIxNSI+c3UgZ3J1cG8gZGUgdXN1YXJpb3M8L3RleHQ+PHRleHQgeD0iNDE1IiB5PSIxNzQiIGZpbGw9IiMxNDUzMmQiIGZvbnQtc2l6ZT0iMTUiPnItLSA9IHNvbG8gbGVlcjwvdGV4dD4KICAgIDxyZWN0IHg9IjQ4NSIgeT0iOTUiIHdpZHRoPSIxMzAiIGhlaWdodD0iNSIgZmlsbD0iI2I0NTMwOSIvPjx0ZXh0IHg9IjU1MCIgeT0iMTMwIiBmaWxsPSIjNzgzNTBmIiBmb250LXdlaWdodD0iNzAwIj5vdHJvcyAobyk8L3RleHQ+PHRleHQgeD0iNTUwIiB5PSIxNTQiIGZpbGw9IiM3ODM1MGYiIGZvbnQtc2l6ZT0iMTUiPmVsIHJlc3RvIGRlbCBtdW5kbzwvdGV4dD48dGV4dCB4PSI1NTAiIHk9IjE3NCIgZmlsbD0iIzc4MzUwZiIgZm9udC1zaXplPSIxNSI+ci0tID0gc29sbyBsZWVyPC90ZXh0PgogICAgPHRleHQgeD0iNzYwIiB5PSIxMzAiIGZpbGw9IiMzMzQxNTUiIGZvbnQtd2VpZ2h0PSI3MDAiPnIgPSByZWFkICAoNCk8L3RleHQ+CiAgICA8dGV4dCB4PSI3NjAiIHk9IjE1NiIgZmlsbD0iIzMzNDE1NSIgZm9udC13ZWlnaHQ9IjcwMCI+dyA9IHdyaXRlICgyKTwvdGV4dD4KICAgIDx0ZXh0IHg9Ijc2MCIgeT0iMTgyIiBmaWxsPSIjMzM0MTU1IiBmb250LXdlaWdodD0iNzAwIj54ID0gZXhlY3V0ZSAoMSk8L3RleHQ+CiAgICA8dGV4dCB4PSI0NTAiIHk9IjIzNSIgZmlsbD0iIzMzNDE1NSIgZm9udC1zaXplPSIyMCI+cnctci0tci0tICA9ICA0KzIgfCA0IHwgNCAgPSAgPHRzcGFuIGZvbnQtd2VpZ2h0PSI3MDAiPjY0NDwvdHNwYW4+PC90ZXh0PgogIDwvZz4KPC9zdmc+Cg==" width="820" alt=""></p>
+<ul>
+<li>Cada archivo tiene <strong>dueño</strong>, <strong>grupo</strong> y tres bloques de permisos: <code>rwx</code>.</li>
+<li>Se pueden <strong>combinar</strong> (no son excluyentes): <code>rw-</code>, <code>r-x</code>…</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">30</span></section>
+<section class="" data-i="31"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Ver y cambiar permisos</h1>
+<pre><code class="language-console">$ ls -l Datos.fastq
+-rw-rw-r-- 1 alumno alumno 36695 Datos.fastq
+</code></pre>
+<p><code>ls -l</code> muestra: <strong>permisos · dueño · grupo · tamaño · nombre</strong>.</p>
+<pre><code class="language-bash">chmod go-w Sample2.fastq     # quita (-) escritura (w) a grupo (g) y otros (o)
+chmod u+x  script.sh         # da (+) ejecución (x) al usuario (u)
+chmod 644  Sample2.fastq     # numérico: rw- r-- r--
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Quién</th>
+<th><code>u</code> usuario · <code>g</code> grupo · <code>o</code> otros · <code>a</code> todos</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Qué</strong></td>
+<td><code>+</code> añadir · <code>-</code> quitar · <code>=</code> fijar</td>
+</tr>
+<tr>
+<td><strong>Permiso</strong></td>
+<td><code>r</code> leer · <code>w</code> escribir · <code>x</code> ejecutar</td>
+</tr>
+</tbody>
+</table><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">31</span></section>
+<section class="" data-i="32"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Entrada y salida de un programa</h1>
+<p><img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5MDAgMzMwIiBmb250LWZhbWlseT0iSGVsdmV0aWNhLCBBcmlhbCwgc2Fucy1zZXJpZiIgeG1sbnM6YzJwYT0iaHR0cDovL2MycGEub3JnL21hbmlmZXN0Ij48bWV0YWRhdGE+PGMycGE6bWFuaWZlc3Q+QUFBV2dtcDFiV0lBQUFBZWFuVnRaR015Y0dFQUVRQVFnQUFBcWdBNG0zRURZekp3WVFBQUFCWmNhblZ0WWdBQUFFZHFkVzFrWXpKdFlRQVJBQkNBQUFDcUFEaWJjUU4xY200Nll6SndZVG8zTkdZMk16QTFPUzB5TURjekxUUTFZVFV0T1RNNE1pMWxZMlpsWWpoa01Ua3hPRFVBQUFBRGwycDFiV0lBQUFBcGFuVnRaR015WVhNQUVRQVFnQUFBcWdBNG0zRURZekp3WVM1aGMzTmxjblJwYjI1ekFBQUFBTHhxZFcxaUFBQUFSR3AxYldSalltOXlBQkVBRUlBQUFLb0FPSnR4RTJNeWNHRXVhVzVuY21Wa2FXVnVkQzUyTXdBQUFBQVlZekp6YUNIMW8xVy9PdnM1czIxdFNxLzR5TlVBQUFCd1kySnZjcU5wWkdNNlptOXliV0YwYldsdFlXZGxMM04yWnl0NGJXeHFhVzV6ZEdGdVkyVkpSSGdzZUcxd09tbHBaRG80WXpZMU1UYzJZUzAwTURRMkxUUXhaVEV0WVdKbE9TMHdZbUZsWldWaE5UWmlORGhzY21Wc1lYUnBiMjV6YUdsd2FIQmhjbVZ1ZEU5bUFBQUI0bXAxYldJQUFBQkJhblZ0WkdOaWIzSUFFUUFRZ0FBQXFnQTRtM0VUWXpKd1lTNWhZM1JwYjI1ekxuWXlBQUFBQUJoak1uTm9iU0tRQ1pFamZGcXRDcWNEb2F3YzRRQUFBWmxqWW05eW9tZGhZM1JwYjI1emdxSm1ZV04wYVc5dWEyTXljR0V1YjNCbGJtVmthbkJoY21GdFpYUmxjbk9oYTJsdVozSmxaR2xsYm5SemdhSmpkWEpzZUMxelpXeG1JMnAxYldKbVBXTXljR0V1WVhOelpYSjBhVzl1Y3k5ak1uQmhMbWx1WjNKbFpHbGxiblF1ZGpOa2FHRnphRmdndlRnMElua2pNcVlaZlQ1bU0xS1NNNlZVRThVSU9JRnc0T09XVE1ZTlpIS2tabUZqZEdsdmJuZ2RZMjl0TG1GdWRHaHliM0JwWXk1amJHRjFaR1V1Y0hKdmRtbGtaV1JxY0dGeVlXMWxkR1Z5YzZGNEgyTnZiUzVoYm5Sb2NtOXdhV011YjNKcFoybHVMV052Ym1acFpHVnVZMlZuZFc1cmJtOTNibXRrWlhOamNtbHdkR2x2Ym5obVEyeGhkV1JsSUhCeWIzWnBaR1ZrSUhSb2FYTWdabWxzWlNCaGRDQjBhR1VnY21WeGRXVnpkQ0J2WmlCaElIVnpaWElnWVc1a0lHMWhlU0JvWVhabElHTnlaV0YwWldRZ2IzSWdiVzlrYVdacFpXUWdkR2hsSUdacGJHVWdZMjl1ZEdWdWRITXViWE52Wm5SM1lYSmxRV2RsYm5TaFpHNWhiV1ZtUTJ4aGRXUmxjbUZzYkVGamRHbHZibk5KYm1Oc2RXUmxaUFVBQUFESWFuVnRZZ0FBQUVCcWRXMWtZMkp2Y2dBUkFCQ0FBQUNxQURpYmNSTmpNbkJoTG1oaGMyZ3VaR0YwWVFBQUFBQVlZekp6YUVKZVNXbXM5QzMxVnlETm1zODhrTDRBQUFDQVkySnZjcVZqWVd4blpuTm9ZVEkxTm1Od1lXUk5BQUFBQUFBQUFBQUFBQUFBQUdSb1lYTm9XQ0R0dWRiZU1mcnhrTENpbU8rQ3ZiNmdIVlNtTVlDaXJmQmNaUU11RWxZL3NtUnVZVzFsYm1wMWJXSm1JRzFoYm1sbVpYTjBhbVY0WTJ4MWMybHZibk9Cb21WemRHRnlkQmlvWm14bGJtZDBhQmtlQkFBQUFqNXFkVzFpQUFBQUoycDFiV1JqTW1Oc0FCRUFFSUFBQUtvQU9KdHhBMk15Y0dFdVkyeGhhVzB1ZGpJQUFBQUNEMk5pYjNLbFkyRnNaMlp6YUdFeU5UWnBjMmxuYm1GMGRYSmxlRTF6Wld4bUkycDFiV0ptUFM5ak1uQmhMM1Z5Ympwak1uQmhPamMwWmpZek1EVTVMVEl3TnpNdE5EVmhOUzA1TXpneUxXVmpabVZpT0dReE9URTROUzlqTW5CaExuTnBaMjVoZEhWeVpXcHBibk4wWVc1alpVbEVlQ3g0YlhBNmFXbGtPbVEwTUdSaU9EVmhMVEk1TmpNdE5EQTVNaTFoWkdFNUxXUTNZMk0zTlRaa01ESmxNWEpqY21WaGRHVmtYMkZ6YzJWeWRHbHZibk9Eb21OMWNteDRMWE5sYkdZamFuVnRZbVk5WXpKd1lTNWhjM05sY25ScGIyNXpMMk15Y0dFdWFXNW5jbVZrYVdWdWRDNTJNMlJvWVhOb1dDQzlPRFFpZVNNeXBobDlQbVl6VXBJenBWUVR4UWc0Z1hEZzQ1Wk14ZzFrY3FKamRYSnNlQ3B6Wld4bUkycDFiV0ptUFdNeWNHRXVZWE56WlhKMGFXOXVjeTlqTW5CaExtRmpkR2x2Ym5NdWRqSmthR0Z6YUZnZ3NsS3VxSFcyWWxxc0cxbnQ4bTcwRWEyd0x6VlV5UWNqVEtYZEt2b1ZyZVdpWTNWeWJIZ3BjMlZzWmlOcWRXMWlaajFqTW5CaExtRnpjMlZ5ZEdsdmJuTXZZekp3WVM1b1lYTm9MbVJoZEdGa2FHRnphRmdnQ2paaXR2alBNbjNTdFFWM0VqUmNQUkg3ekQyY0lHZzI1WVVDS0NZREl6eDBZMnhoYVcxZloyVnVaWEpoZEc5eVgybHVabStqWkc1aGJXVnZRVzUwYUhKdmNHbGpJRVpwYkdWelozWmxjbk5wYjI1bE1TNHdMakJyYzNCbFkxWmxjbk5wYjI1bE1pNDBMakFBQUJBNGFuVnRZZ0FBQUNocWRXMWtZekpqY3dBUkFCQ0FBQUNxQURpYmNRTmpNbkJoTG5OcFoyNWhkSFZ5WlFBQUFCQUlZMkp2Y3RLRVdRSVNvZ0VtR0NGWkFnb3dnZ0lHTUlJQmphQURBZ0VDQWhSQTVhQUs3c0k1MEw2NGcvb0dRZ1U5WjFVVEFEQUtCZ2dxaGtqT1BRUURBekJKTVJjd0ZRWURWUVFLRXc1QmJuUm9jbTl3YVdNc0lGQkNRekV1TUN3R0ExVUVBeE1sUVc1MGFISnZjR2xqSUVOdmJuUmxiblFnUTNKbFpHVnVkR2xoYkhNZ1VtOXZkQ0JEUVRBZUZ3MHlOakE0TURjeE9EUXpOVFphRncweU9EQTRNRFl4T1RRek5UWmFNRVF4RnpBVkJnTlZCQW9URGtGdWRHaHliM0JwWXl3Z1VFSkRNU2t3SndZRFZRUURFeUJCYm5Sb2NtOXdhV01nUTJ4aGRXUmxJRU52Ym5SbGJuUWdVMmxuYm1sdVp6QlpNQk1HQnlxR1NNNDlBZ0VHQ0NxR1NNNDlBd0VIQTBJQUJKaDZDbXZMVUJnRkZOVTB2VUtsT1Z0RTZkamQxN0w1U3V3WDBMZW1GaXNCTTNka2QvM2N5anhGQTNRbzVTNDZmWDAvaWhZMFZaN21mYjlLRjcwM3Q1T2pXREJXTUE0R0ExVWREd0VCL3dRRUF3SUhnREFWQmdOVkhTVUVEakFNQmdvckJnRUVBWVBvWGdJQk1Bd0dBMVVkRXdFQi93UUNNQUF3SHdZRFZSMGpCQmd3Rm9BVXpsSGlCSUZPWkZzaitPUEV6NW8rbk1IWFhNSXdDZ1lJS29aSXpqMEVBd01EWndBd1pBSXdNWE1kRko0QmV0TExWWTdPUnVFOW5vcWJiQVpPWm4vYUFyWHlUd0ZBWmZLclB6eEYydlBvSk5mMStVQ2RnMVhHQWpCd1gxemQ5V0dxWWtxbUw1U0ZxdzFReVNqcjF6SmZwSk05KzFyZER3U1BMTU9QT2pLdWlYam9VL3BVVWVHOVJ3bWhZM0JoWkZrTm5nQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUFpZUU9CdEhCa1U4U0ZFZW9FTFdqR3NZdkxmWEZnSERaZHFhS0RCQThKRkV2TGRYdlQwc2NPektxOTI4RlJJd29lRXd1UjZMVGJIQzV3QkM3bnRrMEd5T084PTwvYzJwYTptYW5pZmVzdD48L21ldGFkYXRhPgogIDxkZWZzPjxtYXJrZXIgaWQ9ImIiIHZpZXdCb3g9IjAgMCAxMCAxMCIgcmVmWD0iOSIgcmVmWT0iNSIgbWFya2VyV2lkdGg9IjgiIG1hcmtlckhlaWdodD0iOCIgb3JpZW50PSJhdXRvIj48cGF0aCBkPSJNMCAwTDEwIDVMMCAxMHoiIGZpbGw9IiMzMzQxNTUiLz48L21hcmtlcj48L2RlZnM+CiAgPHJlY3QgeD0iMjAiIHk9Ijk1IiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjE0MCIgcng9IjE0IiBmaWxsPSIjZTBmMmZlIiBzdHJva2U9IiMwMzY5YTEiIHN0cm9rZS13aWR0aD0iMyIvPgogIDx0ZXh0IHg9IjExNSIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMGM0YTZlIj5wcm9ncmFtYTwvdGV4dD4KICA8dGV4dCB4PSIxMTUiIHk9IjE4MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNyIgZmlsbD0iIzBjNGE2ZSI+ZWouOiBoZWFkLCBid2HigKY8L3RleHQ+CiAgPHRleHQgeD0iMTE1IiB5PSIyMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTUiIGZpbGw9IiM0NzU1NjkiPnN0ZGluICgwKSDihpAgZW50cmFkYTwvdGV4dD4KICA8bGluZSB4MT0iMjEwIiB5MT0iMTI1IiB4Mj0iNDAwIiB5Mj0iNzAiIHN0cm9rZT0iIzE1ODAzZCIgc3Ryb2tlLXdpZHRoPSI0IiBtYXJrZXItZW5kPSJ1cmwoI2IpIi8+CiAgPHRleHQgeD0iMzA1IiB5PSI3OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxNyIgZmlsbD0iIzE0NTMyZCIgZm9udC13ZWlnaHQ9IjcwMCI+c3Rkb3V0ICgxKTwvdGV4dD4KICA8bGluZSB4MT0iMjEwIiB5MT0iMjA1IiB4Mj0iNDAwIiB5Mj0iMjYwIiBzdHJva2U9IiNiOTFjMWMiIHN0cm9rZS13aWR0aD0iNCIgbWFya2VyLWVuZD0idXJsKCNiKSIvPgogIDx0ZXh0IHg9IjMwNSIgeT0iMjY1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE3IiBmaWxsPSIjN2YxZDFkIiBmb250LXdlaWdodD0iNzAwIj5zdGRlcnIgKDIpPC90ZXh0PgogIDxyZWN0IHg9IjQwMCIgeT0iNDAiIHdpZHRoPSIyMDAiIGhlaWdodD0iNjAiIHJ4PSIxMCIgZmlsbD0iI2RjZmNlNyIgc3Ryb2tlPSIjMTU4MDNkIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI1MDAiIHk9Ijc3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE5IiBmaWxsPSIjMTQ1MzJkIj5wYW50YWxsYSAoZGVmZWN0byk8L3RleHQ+CiAgPHJlY3QgeD0iNDAwIiB5PSIyMzAiIHdpZHRoPSIyMDAiIGhlaWdodD0iNjAiIHJ4PSIxMCIgZmlsbD0iI2ZlZTJlMiIgc3Ryb2tlPSIjYjkxYzFjIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSI1MDAiIHk9IjI2NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzdmMWQxZCI+cGFudGFsbGEgKGRlZmVjdG8pPC90ZXh0PgogIDxsaW5lIHgxPSI2MDAiIHkxPSI3MCIgeDI9IjY5MCIgeTI9IjcwIiBzdHJva2U9IiMxNTgwM2QiIHN0cm9rZS13aWR0aD0iMyIgbWFya2VyLWVuZD0idXJsKCNiKSIvPgogIDx0ZXh0IHg9IjY0NSIgeT0iNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMjIiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMxNDUzMmQiPiZndDs8L3RleHQ+CiAgPHJlY3QgeD0iNjkwIiB5PSI0MCIgd2lkdGg9IjE5MCIgaGVpZ2h0PSI2MCIgcng9IjEwIiBmaWxsPSIjZmZmIiBzdHJva2U9IiMxNTgwM2QiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNiA0Ii8+CiAgPHRleHQgeD0iNzg1IiB5PSI3NyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxOSIgZmlsbD0iIzE0NTMyZCI+YXJjaGl2by5vdXQ8L3RleHQ+CiAgPGxpbmUgeDE9IjYwMCIgeTE9IjI2MCIgeDI9IjY5MCIgeTI9IjI2MCIgc3Ryb2tlPSIjYjkxYzFjIiBzdHJva2Utd2lkdGg9IjMiIG1hcmtlci1lbmQ9InVybCgjYikiLz4KICA8dGV4dCB4PSI2NDUiIHk9IjI0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIyMiIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iIzdmMWQxZCI+MiZndDs8L3RleHQ+CiAgPHJlY3QgeD0iNjkwIiB5PSIyMzAiIHdpZHRoPSIxOTAiIGhlaWdodD0iNjAiIHJ4PSIxMCIgZmlsbD0iI2ZmZiIgc3Ryb2tlPSIjYjkxYzFjIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjYgNCIvPgogIDx0ZXh0IHg9Ijc4NSIgeT0iMjY3IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE5IiBmaWxsPSIjN2YxZDFkIj5hcmNoaXZvLmVycjwvdGV4dD4KICA8bGluZSB4MT0iNjAwIiB5MT0iMTY1IiB4Mj0iNjkwIiB5Mj0iMTY1IiBzdHJva2U9IiMzMzQxNTUiIHN0cm9rZS13aWR0aD0iMyIgbWFya2VyLWVuZD0idXJsKCNiKSIvPgogIDx0ZXh0IHg9IjY0NSIgeT0iMTUwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjMzM0MTU1Ij58PC90ZXh0PgogIDxyZWN0IHg9IjY5MCIgeT0iMTM1IiB3aWR0aD0iMTkwIiBoZWlnaHQ9IjYwIiByeD0iMTAiIGZpbGw9IiNmZWYzYzciIHN0cm9rZT0iI2I0NTMwOSIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgPHRleHQgeD0iNzg1IiB5PSIxNzIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTkiIGZpbGw9IiM3ODM1MGYiPm90cm8gcHJvZ3JhbWE8L3RleHQ+Cjwvc3ZnPgo=" width="880" alt=""></p>
+<ul>
+<li><strong>stdout (1):</strong> lo que el programa dice cuando <strong>todo va bien</strong>.</li>
+<li><strong>stderr (2):</strong> los <strong>mensajes de error</strong>.</li>
+<li>Por defecto ambos van a la <strong>pantalla</strong>, pero podemos <strong>desviarlos</strong>.</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">32</span></section>
+<section class="" data-i="33"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Redirecciones</h1>
+<table>
+<thead>
+<tr>
+<th>Símbolo</th>
+<th>Efecto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&gt;</code></td>
+<td>stdout → archivo (<strong>sobrescribe</strong>)</td>
+</tr>
+<tr>
+<td><code>&gt;&gt;</code></td>
+<td>stdout → archivo (<strong>añade</strong> al final)</td>
+</tr>
+<tr>
+<td><code>2&gt;</code></td>
+<td>stderr → archivo</td>
+</tr>
+<tr>
+<td><code>&amp;&gt;</code></td>
+<td>ambas salidas → archivo</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">head -n 200 Sample3.sam &gt; encabezamiento.sam   # las 200 primeras líneas, guardadas
+echo &quot;nueva línea&quot; &gt;&gt; Secuencias.txt           # añade al final
+</code></pre>
+<blockquote>
+<p>⚠️ Un solo <code>&gt;</code> <strong>destruye</strong> el contenido previo del archivo destino.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">33</span></section>
+<section class="" data-i="34"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Tuberías (pipes): encadenar programas</h1>
+<p><code>|</code> conecta la <strong>salida</strong> de un comando con la <strong>entrada</strong> del siguiente, <strong>sin archivos intermedios</strong>.</p>
+<pre><code class="language-bash"># Líneas 60 a 240 de Sample1.sam
+head -n 240 Sample1.sam | tail -n 181 &gt; medio.sam
+</code></pre>
+<ol>
+<li><code>head -n 240</code> → se queda con las líneas 1–240.</li>
+<li><code>tail -n 181</code> → de esas, se queda con las <strong>últimas 181</strong> (líneas 60–240).</li>
+<li><code>&gt;</code> → guarda el resultado.</li>
+</ol>
+<blockquote>
+<p>🧮 <strong>Cuidado con el «+1»</strong>: de la 60 a la 240 hay 240 − 60 + 1 = <strong>181</strong> líneas. Con <code>tail -n 180</code> empezarías en la 61.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">34</span></section>
+<section class="" data-i="35"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Segundo plano y comandos largos</h1>
+<pre><code class="language-bash">bwa mem -t 4 idx in1.fq in2.fq  &gt;  process.out  2&gt;  process.err  &amp;
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Parte</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-t 4</code></td>
+<td>usa 4 hilos</td>
+</tr>
+<tr>
+<td><code>&gt; process.out</code></td>
+<td>salida normal (stdout) → archivo (en <code>bwa</code>, el alineamiento SAM)</td>
+</tr>
+<tr>
+<td><code>2&gt; process.err</code></td>
+<td>mensajes de error → archivo</td>
+</tr>
+<tr>
+<td><code>&amp;</code></td>
+<td>ejecuta <strong>en segundo plano</strong> y devuelve el prompt</td>
+</tr>
+</tbody>
+</table>
+<p>Puedes cerrar el portátil, volver más tarde y <strong>leer los archivos</strong> para ver qué pasó.</p>
+<p><em>Otros:</em> <code>Ctrl+C</code> cancela · <code>Ctrl+L</code> limpia pantalla · <code>↑</code> repite el comando anterior · <code>Tab</code> autocompleta.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">35</span></section>
+<section class="" data-i="36"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Comodines (wildcards)</h1>
+<table>
+<thead>
+<tr>
+<th>Comodín</th>
+<th>Significa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>*</code></td>
+<td>cualquier cosa (0 o más caracteres)</td>
+</tr>
+<tr>
+<td><code>?</code></td>
+<td>exactamente un carácter</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="language-bash">ls *.sam              # Sample1.sam  Sample3.sam  Sample4.sam
+ls Sample?.fastq      # Sample2.fastq
+md5sum *.*            # md5 de todos los archivos con extensión
+</code></pre>
+<blockquote>
+<p>Un solo comando actúa sobre <strong>cientos de archivos</strong>: clave para procesar muestras en lote.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">36</span></section>
+<section class="" data-i="37"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>¿Dónde busca Linux los programas?</h1>
+<ul>
+<li>Al escribir <code>ls</code> o <code>cp</code>, el sistema busca ese programa en unas carpetas definidas por la variable de entorno <strong><code>PATH</code></strong>.</li>
+<li>Programas <strong>compilados</strong> (ya listos): se llaman por su nombre → <code>ls</code>, <code>cp</code>, <code>bwa</code>.</li>
+<li>Programas que <strong>necesitan intérprete</strong> (Python, Java…): se ejecutan <strong>a través de él</strong>.</li>
+</ul>
+<pre><code class="language-bash">echo $PATH                  # carpetas donde busca programas
+python3 mi_script.py        # el intérprete lee y ejecuta el script
+java -jar herramienta.jar
+</code></pre>
+<p><em>Ya lo retomaremos al programar. Hay un anexo en el campus sobre variables de entorno.</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">37</span></section>
+<section class="" data-i="38"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Los archivos de la práctica</h1>
+<table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>Tipo</th>
+<th>Tamaño</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Datos.fastq</code>, <code>Sample2.fastq</code>, <code>Secuencias.txt</code></td>
+<td><strong>FASTQ</strong> (lecturas)</td>
+<td>100 / 400 / 300 lecturas</td>
+</tr>
+<tr>
+<td><code>Sample1.sam</code>, <code>Sample3.sam</code>, <code>Sample4.sam</code></td>
+<td><strong>SAM</strong> (alineamientos)</td>
+<td>2 000 – 5 000 líneas</td>
+</tr>
+<tr>
+<td><code>Tema1.1.docx</code></td>
+<td><strong>Word</strong> (¡no es texto plano!)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Todos menos el <code>.docx</code> son <strong>texto plano</strong> ⇒ se leen con <code>cat</code>, <code>less</code>, <code>head</code>…</p>
+<blockquote>
+<p>🧩 <code>Secuencias.txt</code> se llama «secuencias» y el ejercicio lo renombra «aminoácidos»: en realidad es <strong>FASTQ</strong> (ADN). ¡El nombre no manda sobre el contenido!</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">38</span></section>
+<section class="" data-i="39"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Un vistazo a FASTQ: 4 líneas por lectura</h1>
+<pre><code class="language-text">@A01196:35:H2YTJDRX2:1:2101:29677:1376 1:N:0:CGGCTATG+ACGTCCTG   ← 1. identificador
+CCAACAGGGTTGGTCTCCGTACGTTTCCTCACCTGCATTTCGTTCGTAGTCCCC…      ← 2. secuencia (ACGT)
++                                                               ← 3. separador
+FFFF,FFFFFFF,FFF,FFFFFFF:F:FFFF,::,FF,F:FFFF::FF,FFF:FFFF…   ← 4. calidad de cada base
+</code></pre>
+<ul>
+<li>1 200 líneas ÷ 4 = <strong>300 lecturas</strong> en <code>Secuencias.txt</code>.</li>
+<li>La línea de calidad usa <strong>un carácter ASCII por base</strong>: aquí reaparece la tabla ASCII.</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Carácter</th>
+<th>ASCII</th>
+<th>Phred (ASCII − 33)</th>
+<th>Prob. de error</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>F</code></td>
+<td>70</td>
+<td><strong>37</strong></td>
+<td>~ 1 entre 5 000</td>
+</tr>
+<tr>
+<td><code>:</code></td>
+<td>58</td>
+<td>25</td>
+<td>~ 0,3 %</td>
+</tr>
+<tr>
+<td><code>,</code></td>
+<td>44</td>
+<td>11</td>
+<td>~ 8 %</td>
+</tr>
+</tbody>
+</table><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">39</span></section>
+<section class="" data-i="40"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Un vistazo a SAM</h1>
+<pre><code class="language-text">@HD  VN:1.0  SO:unsorted             ← líneas de cabecera: empiezan por @
+@SQ  SN:1    LN:248956422            ← cromosoma 1 mide 248 956 422 pb
+…
+A01196:33:…  83  6  151468641  60  100M1S  =  151468462  -280  CATGGTTT…  FFFF…
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Valor</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLAG</td>
+<td>83</td>
+<td>información sobre el alineamiento</td>
+</tr>
+<tr>
+<td>RNAME / POS</td>
+<td>6 / 151468641</td>
+<td>cromosoma 6, posición</td>
+</tr>
+<tr>
+<td>MAPQ</td>
+<td>60</td>
+<td>calidad del alineamiento</td>
+</tr>
+<tr>
+<td>CIGAR</td>
+<td>100M1S</td>
+<td>100 bases alineadas + 1 recortada</td>
+</tr>
+</tbody>
+</table>
+<p><em>Entenderlos en detalle es tarea de temas posteriores.</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">40</span></section>
+<section class="lead" data-i="41"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Práctica</h1>
+<h2>Ejercicios 1.1 y 1.2</h2>
+<p><em>(minutos 75 – 112)</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">41</span></section>
+<section class="" data-i="42"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Cómo trabajamos la práctica</h1>
+<ol>
+<li>Descarga la carpeta compartida <strong><code>Tema1</code></strong>.</li>
+<li>Abre el cuaderno interactivo (<em>marimo</em>):</li>
+</ol>
+<pre><code class="language-bash">pip install marimo
+marimo edit tema1_1_ejercicios.py
+</code></pre>
+<ol start="3">
+<li>Cada ejercicio: <strong>enunciado → pista → comando → comprobación ✔</strong>.</li>
+<li>En el cuaderno la terminal es un <strong>laboratorio aislado</strong> (copia temporal): puedes equivocarte sin riesgo.</li>
+<li>Para el <strong>entregable</strong>: copia los comandos de la <strong>hoja de respuestas</strong> en el documento <code>Tema1.1</code>, exporta a <strong>PDF</strong> y súbelo a Moodle.</li>
+</ol>
+<blockquote>
+<p><em>En una terminal real</em> sustituirás el cuaderno por tu consola (¡y por <code>nano</code> de verdad!).</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">42</span></section>
+<section class="small" data-i="43"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Ejercicios 1.1 · tareas 1–6</h1>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Enunciado</th>
+<th>Comando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Ruta completa actual</td>
+<td><code>pwd</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Listar archivos y carpetas</td>
+<td><code>ls</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Entrar en <code>Tema1</code></td>
+<td><code>cd Tema1</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Crear carpeta <code>Datos</code></td>
+<td><code>mkdir Datos</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Copiar <code>Secuencias.txt</code> a <code>Datos</code></td>
+<td><code>cp Secuencias.txt Datos/</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Renombrar a <code>aminoacidos.tt</code></td>
+<td><code>cd Datos</code> → <code>mv Secuencias.txt aminoacidos.tt</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Comprobación rápida:</strong> <code>md5sum Secuencias.txt Datos/aminoacidos.tt</code> ⇒ ¡mismo código! (copiar y renombrar no alteran el contenido).</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">43</span></section>
+<section class="small" data-i="44"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Ejercicios 1.1 · tareas 7–11</h1>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Enunciado</th>
+<th>Comando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7</td>
+<td>Leer <code>aminoacidos.tt</code></td>
+<td><code>cat aminoacidos.tt</code> (o <code>less</code>)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Enlace simbólico a <code>Secuencias.txt</code></td>
+<td><code>ln -s ../Secuencias.txt Secuencias.txt</code></td>
+</tr>
+<tr>
+<td>9</td>
+<td>Leer el enlace</td>
+<td><code>cat Secuencias.txt</code></td>
+</tr>
+<tr>
+<td>10</td>
+<td>Añadir línea al <strong>original</strong> con nano y releer</td>
+<td><code>cd ..</code> → <code>nano Secuencias.txt</code> → <code>cat Secuencias.txt</code></td>
+</tr>
+<tr>
+<td>11</td>
+<td>Eliminar <code>aminoacidos.tt</code></td>
+<td><code>rm Datos/aminoacidos.tt</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Nano:</strong> escribe · <code>Ctrl+O</code> guarda (Enter) · <code>Ctrl+X</code> sale.</p><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">44</span></section>
+<section class="" data-i="45"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Las dos trampas del ejercicio 8 y 10</h1>
+<p><strong>Ejercicio 8 — la ruta del enlace se lee desde donde vive el enlace</strong></p>
+<pre><code class="language-console">Datos$ ln -s Secuencias.txt Secuencias.txt      ✘  apunta a sí mismo (bucle)
+Datos$ cat Secuencias.txt
+cat: Secuencias.txt: Too many levels of symbolic links
+Datos$ ln -s ../Secuencias.txt Secuencias.txt   ✔  sube un nivel
+</code></pre>
+<p><strong>Ejercicio 10 — copia vs enlace tras editar el original</strong></p>
+<table>
+<thead>
+<tr>
+<th>Archivo</th>
+<th>¿Ve la línea nueva?</th>
+<th>Por qué</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Tema1/Secuencias.txt</code> (original)</td>
+<td>✔</td>
+<td>lo editamos</td>
+</tr>
+<tr>
+<td><code>Datos/Secuencias.txt</code> (enlace)</td>
+<td>✔</td>
+<td><strong>apunta</strong> al original</td>
+</tr>
+<tr>
+<td><code>Datos/aminoacidos.tt</code> (copia)</td>
+<td>✘</td>
+<td>tiene <strong>vida propia</strong></td>
+</tr>
+</tbody>
+</table><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">45</span></section>
+<section class="small" data-i="46"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Ejercicios 1.2 · tareas 1–6</h1>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Enunciado</th>
+<th>Solución</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>¿Qué archivo <strong>no</strong> es texto ASCII? ¿Qué pasa al leerlo?</td>
+<td><code>Tema1.1.docx</code> (Word): <code>less</code> avisa y muestra <strong>galimatías</strong></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Permisos de todos los archivos</td>
+<td><code>ls -l</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>Sample2.fastq</code>: solo el propietario escribe</td>
+<td><code>chmod go-w Sample2.fastq</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Primeras 50 líneas de <code>Datos.fastq</code></td>
+<td><code>head -n 50 Datos.fastq</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>encabezamiento.sam</code> con las 200 primeras de <code>Sample3.sam</code></td>
+<td><code>head -n 200 Sample3.sam &gt; encabezamiento.sam</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>medio.sam</code> con las líneas 60–240 de <code>Sample1.sam</code></td>
+<td><code>head -n 240 Sample1.sam \| tail -n 181 &gt; medio.sam</code></td>
+</tr>
+</tbody>
+</table><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">46</span></section>
+<section class="small" data-i="47"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Ejercicios 1.2 · tarea 7: ¿qué dos archivos son el mismo?</h1>
+<pre><code class="language-console">$ md5sum *.*
+692e37518699397fe8ab946e361d9d7c  Datos.fastq
+49ce938477a0efcb2c5fcc14c88ab7dd  Sample1.sam        ← iguales
+57ecbef6b716b5964941429326fa55c0  Sample2.fastq
+c6d2b56df1793957ae846ea07713fbd4  Sample3.sam
+49ce938477a0efcb2c5fcc14c88ab7dd  Sample4.sam        ← iguales
+4da2cd2572f823df22e3374806438605  Secuencias.txt
+</code></pre>
+<p><strong><code>Sample1.sam</code> y <code>Sample4.sam</code> son el mismo archivo</strong> con distinto nombre. <em>(La salida real incluye también <code>Tema1.1.docx</code>.)</em></p>
+<ul>
+<li><code>*.*</code> es un <strong>comodín</strong>: «cualquier nombre, punto, cualquier extensión».</li>
+<li>Ambos pesan exactamente <strong>634 356 bytes</strong> (<code>ls -l</code>): primera pista, pero <strong>solo el md5</strong> lo demuestra.</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">47</span></section>
+<section class="" data-i="48"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Mini-quiz (5 min)</h1>
+<ol>
+<li>¿Cuántos estados distintos puede tener <strong>1 byte</strong>?</li>
+<li>Si renombro <code>datos.fastq</code> a <code>datos.pdf</code>, ¿se convierte en PDF?</li>
+<li>Estoy en <code>~/Tema1/Datos</code>. ¿Cómo hago referencia a <code>~/Tema1/Secuencias.txt</code> con ruta relativa?</li>
+<li>¿Qué diferencia hay entre <code>&gt;</code> y <code>&gt;&gt;</code>?</li>
+<li>¿Qué hace <code>head -n 100 a.sam | tail -n 10</code>?</li>
+<li>Copio un archivo y edito el original. ¿Qué cambia si uso <code>cp</code>? ¿Y si uso <code>ln -s</code>?</li>
+</ol><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">48</span></section>
+<section class="tiny" data-i="49"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Chuleta del Tema 1</h1>
+<table>
+<thead>
+<tr>
+<th>Quiero…</th>
+<th>Comando</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>saber dónde estoy / qué hay</td>
+<td><code>pwd</code> · <code>ls -l</code></td>
+</tr>
+<tr>
+<td>moverme</td>
+<td><code>cd carpeta</code> · <code>cd ..</code> · <code>cd ~</code></td>
+</tr>
+<tr>
+<td>crear / copiar / mover / borrar</td>
+<td><code>mkdir</code> · <code>cp</code> · <code>mv</code> · <code>rm</code></td>
+</tr>
+<tr>
+<td>enlace simbólico</td>
+<td><code>ln -s DESTINO ENLACE</code></td>
+</tr>
+<tr>
+<td>leer</td>
+<td><code>cat</code> · <code>less</code> · <code>head -n N</code> · <code>tail -n N</code> · <code>wc -l</code></td>
+</tr>
+<tr>
+<td>permisos</td>
+<td><code>ls -l</code> · <code>chmod go-w archivo</code></td>
+</tr>
+<tr>
+<td>comparar / verificar</td>
+<td><code>md5sum archivo</code></td>
+</tr>
+<tr>
+<td>pedir ayuda</td>
+<td><code>comando --help</code> · <code>man comando</code></td>
+</tr>
+<tr>
+<td>guardar salida / errores</td>
+<td><code>&gt;</code> · <code>&gt;&gt;</code> · <code>2&gt;</code></td>
+</tr>
+<tr>
+<td>encadenar comandos</td>
+<td><code>cmd1 \| cmd2</code></td>
+</tr>
+<tr>
+<td>ejecutar en segundo plano</td>
+<td><code>cmd &amp;</code></td>
+</tr>
+<tr>
+<td>seleccionar varios archivos</td>
+<td><code>*.sam</code> · <code>Sample?.fastq</code></td>
+</tr>
+</tbody>
+</table><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">49</span></section>
+<section class="" data-i="50"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Errores típicos y buenas prácticas</h1>
+<ul>
+<li>❌ Olvidar que Linux <strong>distingue mayúsculas</strong>.</li>
+<li>❌ Espacios en nombres de archivo: usa <code>_</code> (<code>mis_datos.txt</code>, no <code>mis datos.txt</code>).</li>
+<li>❌ Usar <code>&gt;</code> donde querías <code>&gt;&gt;</code> (¡borra el archivo!).</li>
+<li>❌ Trabajar sobre los <strong>datos originales</strong>: haz <strong>copias</strong> o enlaces.</li>
+<li>✔ Usa <strong><code>Tab</code></strong> para autocompletar y <strong><code>↑</code></strong> para repetir.</li>
+<li>✔ Comprueba tras cada paso con <code>ls</code>, <code>pwd</code>, <code>head</code>.</li>
+<li>✔ Verifica copias grandes con <strong><code>md5sum</code></strong>.</li>
+<li>✔ <strong>Lee la ayuda</strong> antes de ejecutar un programa nuevo.</li>
+</ul><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">50</span></section>
+<section class="" data-i="51"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>Entrega y próximos pasos</h1>
+<p><strong>Entregable</strong></p>
+<ol>
+<li>Completa el documento <code>Tema1.1</code>: pega <strong>los comandos</strong> bajo cada actividad.</li>
+<li>Exporta a <strong>PDF</strong>.</li>
+<li>Súbelo a <strong>Moodle</strong>.</li>
+</ol>
+<p><strong>Próximo tema (Tema 2):</strong> gestión de datos de origen biológico — formatos <strong>FASTA</strong> y compañía.</p>
+<p><br></p>
+<blockquote>
+<p><strong>Idea final:</strong> un archivo es una <strong>secuencia de bytes con una codificación</strong>; la terminal es la forma más <strong>directa, potente y reproducible</strong> de trabajar con ellos.</p>
+</blockquote><footer>Tema 1 · Herramientas bioinformáticas</footer><span class="pg">51</span></section>
+<section class="lead" data-i="52"><header>Bioinformática y análisis de datos ómicos · Laboratorio 1</header><h1>¿Preguntas?</h1>
+<h2>Gracias</h2>
+<p><em>Material: <code>tema1_clase.md</code> (esta presentación) · <code>tema1_1_ejercicios.py</code> (cuaderno marimo)</em></p><footer>Tema 1 · Herramientas bioinformáticas</footer></section></div><div id="notes"></div>
+<div id="help">← → navegar · <b>N</b> notas · <b>O</b> vista general · <b>F</b> pantalla completa</div>
+<script>
+const S=[...document.querySelectorAll('section')],N=["NOTAS (0:00 – 0:03). Bienvenida. Idea de la sesión: entender qué hay \"debajo\" de los archivos\nque usaremos todo el curso (FASTQ, SAM…) y aprender a manejarlos desde la terminal.\nAl final de la clase cada estudiante habrá resuelto los ejercicios 1.1 y 1.2.", "Avisar: la teoría va rápida porque lo importante es la práctica. Las diapositivas quedan\ndisponibles como material de repaso.", "", "", "", "Terminología: en el curso se llama \"ROM\" al almacenamiento de larga duración (disco duro).\nRigor: en sentido estricto ROM es memoria de solo lectura (firmware); el disco/SSD es\n\"almacenamiento secundario\". Lo importante es la diferencia de velocidad y persistencia.", "", "", "", "", "", "", "", "", "Matiz de rigor: md5 sirve perfectamente para verificar integridad y duplicados accidentales;\nya no se considera seguro frente a ataques deliberados (colisiones fabricadas). Aquí es suficiente.\nAdelantar: en el ejercicio 1.2 descubrimos que Sample1.sam y Sample4.sam son el mismo archivo.", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "Aviso: en el vídeo de la asignatura se usa tail -n 180 y se dice que se quitan 59 líneas;\nen realidad quitar 59 de 240 deja 181. La forma correcta de obtener \"60–240\" es tail -n 181.\nEs un buen ejemplo del error \"off-by-one\" que conviene comprobar con wc -l.", "En el vídeo se menciona \"el signo dólar\" para segundo plano; el símbolo correcto es & (ampersand).\n$ es el símbolo del prompt y de las variables.", "", "", "", "", "", "", "", "Dinámica (≈ 8 min): ejecutar 1–3 en directo; que el alumnado haga 4–6 solo. Insistir en mirar el prompt.", "Dinámica (≈ 10 min). Pedir que predigan antes de ejecutar la 10: ¿quién verá la línea nueva?\n(el original ✔, el enlace ✔, la copia ✘).", "", "Dinámica (≈ 8 min). En la 6 pedir que verifiquen con wc -l medio.sam (debe dar 181).", "", "Respuestas: 1) 256. 2) No; solo cambia el nombre. 3) ../Secuencias.txt. 4) > sobrescribe,\n>> añade. 5) Las líneas 91–100. 6) Con cp la copia no cambia; con ln -s el enlace refleja el cambio.", "", "", "", ""],st=document.getElementById('stage'),nt=document.getElementById('notes'),bar=document.getElementById('bar');
+let i=0;
+function fit(){if(document.body.classList.contains('ov'))return;const k=Math.min(innerWidth/1280,innerHeight/720);st.style.transform=`scale(${k}) translate(-50%,-50%)`;st.style.marginLeft='0';}
+function go(n){i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,j)=>s.classList.toggle('on',j===i));bar.style.width=((i+1)/S.length*100)+'%';nt.textContent=N[i]||'(sin notas en esta diapositiva)';history.replaceState(null,'','#'+(i+1));}
+addEventListener('keydown',e=>{const k=e.key;
+ if(['ArrowRight','PageDown',' ','Enter'].includes(k)){e.preventDefault();go(i+1)}
+ else if(['ArrowLeft','PageUp','Backspace'].includes(k)){e.preventDefault();go(i-1)}
+ else if(k==='Home')go(0);else if(k==='End')go(S.length-1);
+ else if(k==='n'||k==='N')nt.classList.toggle('show');
+ else if(k==='f'||k==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}
+ else if(k==='o'||k==='O'||k==='Escape'){document.body.classList.toggle('ov');fit();document.querySelector('section.on')?.scrollIntoView({block:'center'})}});
+S.forEach((s,j)=>s.addEventListener('click',e=>{if(document.body.classList.contains('ov')){go(j);document.body.classList.remove('ov');fit()}}));
+st.addEventListener('click',e=>{if(!document.body.classList.contains('ov')){e.clientX>innerWidth/2?go(i+1):go(i-1)}});
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)go(i+(d<0?1:-1));tx=null});
+addEventListener('resize',fit);addEventListener('hashchange',()=>go((parseInt(location.hash.slice(1))||1)-1));
+setTimeout(()=>document.getElementById('help').style.opacity=0,6000);
+fit();go((parseInt(location.hash.slice(1))||1)-1);
+</script></body></html>
