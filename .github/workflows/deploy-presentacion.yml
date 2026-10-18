@@ -15,6 +15,9 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ──────────────────────────────────────────────────────────────
+  # 1) BUILD: prepara el sitio (presentación + export WASM marimo)
+  # ──────────────────────────────────────────────────────────────
   build:
     runs-on: ubuntu-latest
     steps:
@@ -29,17 +32,32 @@ jobs:
       - name: Instalar marimo
         run: pip install --quiet --upgrade marimo
 
-      - name: Ver versión de marimo
-        run: marimo --version
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@v7
 
-      - name: Listar archivos (diagnóstico)
+      - name: Ver versiones instaladas
         run: |
-          echo "=== Archivos en la raíz ==="
-          ls -la
-          echo "=== ¿Existe tema1_terminal.py? ==="
-          test -f tema1_terminal.py && echo "SÍ" || (echo "NO" && exit 1)
+          echo "Python:  $(python --version)"
+          echo "marimo:  $(marimo --version)"
+          echo "uv:      $(uv --version)"
 
-      - name: Validar compatibilidad WASM del cuaderno
+      - name: Comprobar que existe la presentación
+        run: |
+          if [ ! -f tema1_clase.html ]; then
+            echo "⚠ No se encontró tema1_clase.html (se publicará sin presentación)."
+          else
+            echo "✔ Presentación encontrada: tema1_clase.html"
+          fi
+
+      - name: Comprobar que existe el cuaderno marimo
+        run: |
+          if [ ! -f tema1_terminal.py ]; then
+            echo "❌ No se encontró tema1_terminal.py en la raíz del repositorio."
+            exit 1
+          fi
+          echo "✔ Cuaderno encontrado: tema1_terminal.py"
+
+      - name: Validar compatibilidad WASM (informativo)
         run: |
           echo "=== marimo check (solo avisos WASM) ==="
           marimo check tema1_terminal.py --select MW || true
@@ -61,9 +79,8 @@ jobs:
             -o _site/tema1_terminal.html \
             --mode run \
             --single-file
-          echo "=== Resultado ==="
-          ls -la _site/tema1_terminal.html
-          file _site/tema1_terminal.html 2>/dev/null || true
+          echo "=== Resultado del export ==="
+          ls -lh _site/tema1_terminal.html
 
       - name: Crear index.html de índice si falta
         run: |
@@ -92,13 +109,13 @@ jobs:
           EOF
           fi
 
-      - name: Desactivar Jekyll
+      - name: Desactivar procesado Jekyll
         run: touch _site/.nojekyll
 
       - name: Listar el sitio antes de subirlo (diagnóstico)
         run: |
-          echo "=== _site/ ==="
-          ls -laR _site | head -50
+          echo "=== Contenido de _site/ ==="
+          ls -laR _site | head -60
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
@@ -108,6 +125,9 @@ jobs:
         with:
           path: _site
 
+  # ──────────────────────────────────────────────────────────────
+  # 2) DEPLOY: publica el artefacto en GitHub Pages
+  # ──────────────────────────────────────────────────────────────
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -115,6 +135,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Desplegar
+      - name: Desplegar en GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
