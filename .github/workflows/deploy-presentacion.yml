@@ -15,12 +15,8 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Descargar repositorio
         uses: actions/checkout@v4
@@ -31,12 +27,26 @@ jobs:
           python-version: "3.12"
 
       - name: Instalar marimo
-        run: pip install --quiet marimo
+        run: pip install --quiet --upgrade marimo
+
+      - name: Ver versión de marimo
+        run: marimo --version
+
+      - name: Listar archivos (diagnóstico)
+        run: |
+          echo "=== Archivos en la raíz ==="
+          ls -la
+          echo "=== ¿Existe tema1_terminal.py? ==="
+          test -f tema1_terminal.py && echo "SÍ" || (echo "NO" && exit 1)
+
+      - name: Validar compatibilidad WASM del cuaderno
+        run: |
+          echo "=== marimo check (solo avisos WASM) ==="
+          marimo check tema1_terminal.py --select MW || true
 
       - name: Preparar carpeta del sitio
         run: |
           mkdir -p _site
-          # Copia todos los archivos del repo excepto lo que no debe publicarse
           rsync -a \
             --exclude='.git' \
             --exclude='.github' \
@@ -45,17 +55,17 @@ jobs:
 
       - name: Exportar cuaderno marimo a WASM
         run: |
-          if [ -f tema1_terminal.py ]; then
-            echo "✔ Exportando tema1_terminal.py → _site/tema1_terminal.html"
-            marimo export html-wasm tema1_terminal.py \
-              -o _site/tema1_terminal.html \
-              --mode run \
-              --single-file
-          else
-            echo "⚠ No se encontró tema1_terminal.py (se omite el laboratorio)."
-          fi
+          set -e
+          echo "=== Exportando tema1_terminal.py → _site/tema1_terminal.html ==="
+          marimo export html-wasm tema1_terminal.py \
+            -o _site/tema1_terminal.html \
+            --mode run \
+            --single-file
+          echo "=== Resultado ==="
+          ls -la _site/tema1_terminal.html
+          file _site/tema1_terminal.html 2>/dev/null || true
 
-      - name: Crear index.html de redirección si falta
+      - name: Crear index.html de índice si falta
         run: |
           if [ ! -f _site/index.html ]; then
             cat > _site/index.html <<'EOF'
@@ -69,8 +79,8 @@ jobs:
                      margin: 4rem auto; padding: 0 1rem; line-height: 1.6; }
               a { display: block; padding: .75rem 1rem; margin: .5rem 0;
                   border: 1px solid #ccc; border-radius: .5rem;
-                  text-decoration: none; }
-              a:hover { background: #f0f0f0; }
+                  text-decoration: none; color: #0366d6; }
+              a:hover { background: #f0f6ff; }
             </style>
           </head>
           <body>
@@ -82,8 +92,13 @@ jobs:
           EOF
           fi
 
-      - name: Desactivar procesado Jekyll
+      - name: Desactivar Jekyll
         run: touch _site/.nojekyll
+
+      - name: Listar el sitio antes de subirlo (diagnóstico)
+        run: |
+          echo "=== _site/ ==="
+          ls -laR _site | head -50
 
       - name: Configurar GitHub Pages
         uses: actions/configure-pages@v5
@@ -93,6 +108,13 @@ jobs:
         with:
           path: _site
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - name: Desplegar
         id: deployment
         uses: actions/deploy-pages@v4
