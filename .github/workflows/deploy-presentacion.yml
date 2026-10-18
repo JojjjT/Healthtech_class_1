@@ -1,0 +1,98 @@
+name: Publicar presentación + laboratorio marimo en GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar marimo
+        run: pip install --quiet marimo
+
+      - name: Preparar carpeta del sitio
+        run: |
+          mkdir -p _site
+          # Copia todos los archivos del repo excepto lo que no debe publicarse
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='_site' \
+            ./ _site/
+
+      - name: Exportar cuaderno marimo a WASM
+        run: |
+          if [ -f tema1_terminal.py ]; then
+            echo "✔ Exportando tema1_terminal.py → _site/tema1_terminal.html"
+            marimo export html-wasm tema1_terminal.py \
+              -o _site/tema1_terminal.html \
+              --mode run \
+              --single-file
+          else
+            echo "⚠ No se encontró tema1_terminal.py (se omite el laboratorio)."
+          fi
+
+      - name: Crear index.html de redirección si falta
+        run: |
+          if [ ! -f _site/index.html ]; then
+            cat > _site/index.html <<'EOF'
+          <!doctype html>
+          <html lang="es">
+          <head>
+            <meta charset="utf-8">
+            <title>HealthTech · Clase 1</title>
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 40rem;
+                     margin: 4rem auto; padding: 0 1rem; line-height: 1.6; }
+              a { display: block; padding: .75rem 1rem; margin: .5rem 0;
+                  border: 1px solid #ccc; border-radius: .5rem;
+                  text-decoration: none; }
+              a:hover { background: #f0f0f0; }
+            </style>
+          </head>
+          <body>
+            <h1>HealthTech · Clase 1</h1>
+            <a href="./tema1_clase.html">📊 Presentación (Tema 1)</a>
+            <a href="./tema1_terminal.html">🧪 Laboratorio interactivo (marimo)</a>
+          </body>
+          </html>
+          EOF
+          fi
+
+      - name: Desactivar procesado Jekyll
+        run: touch _site/.nojekyll
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir artefacto
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Desplegar
+        id: deployment
+        uses: actions/deploy-pages@v4
