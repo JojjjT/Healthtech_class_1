@@ -14,20 +14,22 @@ def _():
         # Laboratorio 1 · Tema 1.1 — La terminal de Linux
         **Bioinformática y análisis de datos ómicos** · versión **WASM** (todo en tu navegador)
 
-        Este cuaderno resuelve, paso a paso, los **11 ejercicios del Tema 1.1**, ejecutándose
-        íntegramente en el navegador con Pyodide. No requiere instalar nada.
+        Cada uno de los **11 ejercicios** tiene su **propia caja de comandos**:
+
+        1. Escribe uno o varios comandos (**uno por línea**) en la caja del ejercicio.
+        2. Pulsa **▶ Ejecutar**. Verás la sesión de la terminal y una **comprobación automática** (✔ / ✘).
+        3. Si algo falla, corrige y vuelve a ejecutar. Hay una **💡 Pista** y una **✅ Solución de referencia** desplegables.
 
         **Cómo funciona**
 
         - La "terminal" es una **emulación en Python** (no hay bash real en el navegador), pero
-          los comandos esenciales (`pwd`, `ls`, `cd`, `mkdir`, `cp`, `mv`, `cat`, `ln -s`, `rm`,
-          `wc`, `md5sum`, `tail`, `test`, `echo`…) funcionan igual.
-        - La terminal **recuerda dónde estás** (como una real). Tras un `cd`, los comandos siguientes
-          se ejecutan en esa carpeta.
-        - Ejecuta las celdas **de arriba abajo**.
-        - Para volver a empezar, pulsa **↺ Reiniciar laboratorio**.
-        - En la sección **📤 Subir archivos** puedes cargar tu propio `Secuencias.txt` (o un `.zip`
-          con la carpeta `Tema1`) para trabajar con tus datos reales.
+          `pwd`, `ls`, `cd`, `mkdir`, `cp`, `mv`, `cat`, `ln -s`, `rm`, `wc`, `md5sum`, `head`, `tail`,
+          `echo`… funcionan igual, y también `&&`, `;`, `|`, `<`, `>`, `>>`.
+        - **Cada ejecución parte del estado correcto** tras los ejercicios anteriores. Por eso puedes hacer
+          los ejercicios en cualquier orden, repetirlos y equivocarte sin romper nada.
+        - Dentro de una misma caja los comandos **sí** se encadenan (un `cd` afecta a las líneas siguientes).
+        - `nano` no existe en el navegador: en el ejercicio 10 se emula con `echo "…" >> archivo`.
+        - Al final hay una **🧪 Terminal libre** para experimentar.
         """
     )
     return (mo,)
@@ -36,79 +38,15 @@ def _():
 # ═════════════════════════ Imports ═════════════════════════
 @app.cell(hide_code=True)
 def _():
+    import hashlib
+    import io
     import os
+    import shlex
+    import shutil
     import tempfile
     import zipfile
-    from pathlib import Path
 
-    return Path, os, tempfile, zipfile
-
-
-# ═════════════════════════ Botón reset ═════════════════════════
-@app.cell(hide_code=True)
-def _(mo):
-    reset = mo.ui.button(label="↺ Reiniciar laboratorio", kind="warn")
-    reset
-    return (reset,)
-
-
-# ═════════════════════════ Setup del laboratorio ═════════════════════════
-@app.cell(hide_code=True)
-def _(Path, mo, os, reset, tempfile):
-    reset.value  # al pulsar el botón, esta celda y todas las siguientes se repiten
-
-    import shutil as _shutil
-
-    _DEMO = (
-        "@A01196:35:H2YTJDRX2:1:2101:29677:1376 1:N:0:CGGCTATG+ACGTCCTG\n"
-        "CCAACAGGGTTGGTCTCCGTACGTTTCCTCACCTGCATTTCGTTCGTAGTCCCCGATGAATCG\n"
-        "+\n"
-        "FFFF,FFFFFFF,FFF,FFFFFFF:F:FFFF,::,FF,F:FFFF::FF,FFF:FFFFFF:FFFF\n"
-    ) * 3
-
-    def _find_tema1():
-        """En local (fuera de WASM) intenta localizar la carpeta Tema1 del alumno."""
-        try:
-            if os.environ.get("TEMA1_DIR"):
-                c = Path(os.environ["TEMA1_DIR"])
-                if (c / "Secuencias.txt").exists():
-                    return c
-            try:
-                base = Path(mo.notebook_dir() or ".")
-            except Exception:
-                base = Path(".")
-            for cand in [base / "Tema1", base.parent / "Tema1", Path.cwd() / "Tema1"]:
-                if (cand / "Secuencias.txt").exists():
-                    return cand
-        except Exception:
-            pass
-        return None
-
-    # FS virtual del navegador:  <tmp>/home/alumno/Tema1/...
-    LAB_ROOT = Path(tempfile.mkdtemp(prefix="lab1_"))
-    HOME = LAB_ROOT / "home" / "alumno"
-    HOME.mkdir(parents=True)
-    _tema1 = HOME / "Tema1"
-
-    _src = _find_tema1()
-    _copied = False
-    if _src is not None:
-        try:
-            _shutil.copytree(_src, _tema1)
-            _copied = True
-            _origen = f"copia de `{_src}`"
-        except Exception:
-            pass
-    if not _copied:
-        _tema1.mkdir(parents=True, exist_ok=True)
-        (_tema1 / "Secuencias.txt").write_text(_DEMO)
-        _origen = "datos de **demostración**"
-
-    mo.md(
-        f"Laboratorio listo en una carpeta temporal del **sistema de archivos virtual** "
-        f"del navegador · contenido de `Tema1`: {_origen}."
-    )
-    return (HOME,)
+    return hashlib, io, os, shlex, shutil, tempfile, zipfile
 
 
 # ═════════════════════════ Subida de archivos ═════════════════════════
@@ -122,14 +60,14 @@ def _(mo):
         mo.md(
             r"""
             ---
-            ## 📤 Subir tus archivos
+            ## 📤 Subir tus archivos (opcional)
 
             - **Archivos sueltos** (`Secuencias.txt`, `.fa`, `.fastq`…) → se copian a `~/Tema1/`.
-              Si subes un `Secuencias.txt` nuevo, **sustituye** al de demostración.
-            - **`.zip`** → se extrae en `~/`. Debe contener una carpeta `Tema1/` dentro.
+              Si subes un `Secuencias.txt`, **sustituye** al de demostración.
+            - **`.zip`** → se usan los archivos de su carpeta `Tema1/`.
 
-            > ⚠️ Si subes archivos **después** de haber empezado los ejercicios, pulsa primero
-            > **↺ Reiniciar laboratorio** para que se repitan las comprobaciones.
+            Si no subes nada, se usan **datos de demostración**. Al subir archivos, los resultados
+            de los ejercicios se recalculan solos con tus datos.
             """
         ),
         upload,
@@ -138,1022 +76,1347 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(HOME, mo, upload, zipfile):
-    import io as _io
-
-    _tema1 = HOME / "Tema1"
+def _(io, mo, upload, zipfile):
+    SEED = {}
     _msgs = []
 
-    if upload.value:
-        for _f in upload.value:
-            _name = _f.name
-            _content = _f.contents
-            if callable(_content):  # compatibilidad con versiones antiguas
-                _content = _content()
-
-            if _name.lower().endswith(".zip"):
-                try:
-                    with zipfile.ZipFile(_io.BytesIO(_content)) as _z:
-                        _z.extractall(HOME)
-                    _msgs.append(f"✔ `{_name}` → extraído en `~/`")
-                except Exception as _e:
-                    _msgs.append(f"✘ `{_name}`: {_e}")
-            else:
-                _tema1.mkdir(exist_ok=True)
-                (_tema1 / _name).write_bytes(_content)
-                _msgs.append(f"✔ `{_name}` → `~/Tema1/`")
+    for _f in (upload.value or []):
+        _name = _f.name
+        _content = _f.contents
+        if callable(_content):  # compatibilidad con versiones antiguas
+            _content = _content()
+        if _name.lower().endswith(".zip"):
+            try:
+                with zipfile.ZipFile(io.BytesIO(_content)) as _z:
+                    _found = 0
+                    for _n in _z.namelist():
+                        _parts = [p for p in _n.split("/") if p]
+                        if "Tema1" in _parts and not _n.endswith("/"):
+                            _rest = _parts[_parts.index("Tema1") + 1:]
+                            if len(_rest) == 1:
+                                SEED[_rest[0]] = _z.read(_n)
+                                _found += 1
+                    if _found:
+                        _msgs.append(f"✔ `{_name}` → {_found} archivo(s) de `Tema1/`")
+                    else:
+                        _msgs.append(f"✘ `{_name}`: no contiene archivos dentro de una carpeta `Tema1/`")
+            except Exception as _e:
+                _msgs.append(f"✘ `{_name}`: {_e}")
+        else:
+            SEED[_name] = _content
+            _msgs.append(f"✔ `{_name}` → `~/Tema1/`")
 
     if _msgs:
         mo.md("**Archivos cargados:**\n\n" + "\n".join(f"- {m}" for m in _msgs))
     else:
         mo.md("*Todavía no has subido archivos: se usarán los **datos de demostración**.*")
-    return ()
+    return (SEED,)
 
 
-# ═════════════════════════ Mini-terminal (emulada en Python) ═════════════════════════
+# ═════════════════════════ Motor: terminal emulada + comprobaciones ═════════════════════════
 @app.cell(hide_code=True)
-def _(HOME, mo, os):
-    import hashlib
-    import re
-    import shlex
-    import shutil
+def _(hashlib, os, shlex, shutil, tempfile):
+    DEMO_SEQ = (
+        "@A01196:35:H2YTJDRX2:1:2101:29677:1376 1:N:0:CGGCTATG+ACGTCCTG\n"
+        "CCAACAGGGTTGGTCTCCGTACGTTTCCTCACCTGCATTTCGTTCGTAGTCCCCGATGAATCG\n"
+        "+\n"
+        "FFFF,FFFFFFF,FFF,FFFFFFF:F:FFFF,::,FF,F:FFFF::FF,FFF:FFFFFF:FFFF\n"
+    ) * 3
+
+    READERS = ("cat", "less", "more", "head", "tail")
+
+    # Comandos de referencia: SOLUTIONS[n-1] resuelve el ejercicio n.
+    SOLUTIONS = [
+        ["pwd"],
+        ["ls"],
+        ["cd Tema1"],
+        ["mkdir Datos"],
+        ["cp Secuencias.txt Datos/"],
+        ["cd Datos", "mv Secuencias.txt aminoacidos.tt"],
+        ["cat aminoacidos.tt"],
+        ["ln -s ../Secuencias.txt Secuencias.txt"],
+        ["cat Secuencias.txt"],
+        ["cd ..", 'echo "Estoy añadiendo una nueva línea" >> Secuencias.txt', "cat Secuencias.txt"],
+        ["rm Datos/aminoacidos.tt"],
+    ]
+
+
+    def oserr_text(e):
+        if getattr(e, "errno", None) == 40:
+            return "Too many levels of symbolic links"
+        return getattr(e, "strerror", None) or str(e)
+
 
     class Terminal:
-        """Mini-shell en Python: emula los comandos esenciales del Tema 1.1."""
+        """Mini-shell en Python (sin bash real): todo ocurre dentro de una carpeta temporal."""
 
-        def __init__(self, home):
-            self.home = os.path.normpath(str(home))
+        def __init__(self, root):
+            self.root = os.path.normpath(str(root))
+            self.home = os.path.join(self.root, "home", "alumno")
             self.cwd = self.home
+            self.records = []
 
-        # ─── prompt ───
+        # ───────── rutas ─────────
+        def virt(self, real):
+            v = real[len(self.root):]
+            return v if v else "/"
+
+        def resolve(self, p, cwd=None):
+            base = cwd or self.cwd
+            p = p if p else "."
+            if p == "~" or p.startswith("~/"):
+                full = self.home + p[1:]
+            elif p.startswith("/"):
+                full = self.root + p
+            else:
+                full = os.path.join(base, p)
+            full = os.path.normpath(full)
+            if not (full == self.root or full.startswith(self.root + os.sep)):
+                full = self.root
+            return full
+
         @property
         def prompt(self):
             rel = os.path.relpath(self.cwd, self.home)
-            return "alumno@lab:~$" if rel == "." else f"alumno@lab:~/{rel}$"
+            if rel == ".":
+                return "alumno@lab:~$"
+            if rel.startswith(".."):
+                return "alumno@lab:" + self.virt(self.cwd) + "$"
+            return "alumno@lab:~/" + rel + "$"
 
-        # ─── resolución de rutas ───
-        def _resolve(self, p):
-            p = p.strip().strip("\"'") or "."
-            if p == "~" or p.startswith("~/"):
-                p = self.home + p[1:]
-            elif not p.startswith("/"):
-                p = os.path.join(self.cwd, p)
-            return os.path.normpath(p)
+        # ───────── análisis de la línea ─────────
+        def tokenize(self, line):
+            lex = shlex.shlex(line, posix=True, punctuation_chars=True)
+            lex.whitespace_split = True
+            lex.commenters = ""
+            return list(lex)
 
-        # ─── ejecución ───
-        def run(self, cmd):
-            """Ejecuta una línea con `&&`; devuelve (stdout, stderr)."""
-            c = cmd.strip()
-            if not c:
-                return "", ""
-            parts = [p.strip() for p in c.split("&&")]
-            outs, errs = [], []
-            for part in parts:
-                out, err, code = self._run_single(part)
-                if out:
-                    outs.append(out)
-                if err:
-                    errs.append(err)
-                if code != 0:
-                    break
-            return "\n".join(outs), "\n".join(errs)
-
-        def _run_single(self, cmd):
-            """Ejecuta un comando simple con redirecciones <, >, >>. Devuelve (out, err, code)."""
-            cmd = cmd.strip()
-            if not cmd:
+        def run_line(self, line):
+            """Ejecuta una línea (admite &&, ||, ;, |, <, >, >>). Devuelve (out, err, code)."""
+            line = line.strip()
+            if not line or line.startswith("#"):
                 return "", "", 0
-
-            # Negación para `test`
-            negate = False
-            if cmd.startswith("!"):
-                rest = cmd[1:].lstrip()
-                if rest.startswith("test"):
-                    negate = True
-                    cmd = rest
-
-            # Redirecciones (con espacios alrededor)
-            stdin_file = None
-            stdout_file = None
-            stdout_mode = "w"
-
-            m = re.search(r"^(.*?)\s+>>\s+(\S+)\s*$", cmd)
-            if m:
-                cmd = m.group(1).strip()
-                stdout_file, stdout_mode = m.group(2), "a"
-            else:
-                m = re.search(r"^(.*?)\s+>\s+(\S+)\s*$", cmd)
-                if m:
-                    cmd = m.group(1).strip()
-                    stdout_file, stdout_mode = m.group(2), "w"
-
-            m = re.search(r"^(.*?)\s+<\s+(\S+)\s*$", cmd)
-            if m:
-                cmd = m.group(1).strip()
-                stdin_file = m.group(2)
-
             try:
-                tokens = shlex.split(cmd)
+                tokens = self.tokenize(line)
             except ValueError as e:
-                return "", f"bash: {e}\n", 1
-            if not tokens:
-                return "", "", 0
-
-            command, args = tokens[0], tokens[1:]
-
-            # stdin desde archivo
-            stdin_content = None
-            if stdin_file:
-                p = self._resolve(stdin_file)
+                return "", "bash: error de sintaxis: " + str(e) + "\n", 2
+            seqs = []
+            cur = []
+            op = None
+            for tok in tokens:
+                if tok in ("&&", "||", ";"):
+                    seqs.append((op, cur))
+                    cur = []
+                    op = tok
+                else:
+                    cur.append(tok)
+            seqs.append((op, cur))
+            outs, errs, code = [], [], 0
+            for op, toks in seqs:
+                if op == "&&" and code != 0:
+                    continue
+                if op == "||" and code == 0:
+                    continue
+                if not toks:
+                    continue
                 try:
-                    with open(p, "rb") as fh:
-                        stdin_content = fh.read()
+                    o, e, code = self._pipeline(toks)
+                except Exception as ex:  # nunca debe romper el cuaderno
+                    o, e, code = "", "bash: error interno: " + str(ex) + "\n", 1
+                outs.append(o)
+                errs.append(e)
+            return "".join(outs), "".join(errs), code
+
+        def _pipeline(self, toks):
+            stages = [[]]
+            for t in toks:
+                if t == "|":
+                    stages.append([])
+                else:
+                    stages[-1].append(t)
+            stdin = None
+            out, err_all, code = "", "", 0
+            for st in stages:
+                if not st:
+                    return "", "bash: error de sintaxis cerca de `|'\n", 2
+                out, err, code = self._stage(st, stdin)
+                err_all += err
+                stdin = out.encode("utf-8")
+            return out, err_all, code
+
+        def _stage(self, toks, stdin):
+            args = []
+            fin = None
+            fout = None
+            mode = "w"
+            i = 0
+            while i < len(toks):
+                t = toks[i]
+                if t in ("<", ">", ">>"):
+                    if i + 1 >= len(toks):
+                        return "", "bash: error de sintaxis cerca de `newline'\n", 2
+                    if t == "<":
+                        fin = toks[i + 1]
+                    else:
+                        fout = toks[i + 1]
+                        mode = "a" if t == ">>" else "w"
+                    i += 2
+                    continue
+                args.append(t)
+                i += 1
+
+            cwd_before = self.cwd
+            if fin is not None:
+                try:
+                    with open(self.resolve(fin), "rb") as fh:
+                        stdin = fh.read()
                 except FileNotFoundError:
-                    return "", f"bash: {stdin_file}: No such file or directory\n", 1
+                    return "", "bash: " + fin + ": No such file or directory\n", 1
                 except OSError as e:
-                    return "", f"bash: {stdin_file}: {e}\n", 1
+                    return "", "bash: " + fin + ": " + str(e) + "\n", 1
 
-            out, err, code = self._dispatch(command, args, stdin_content)
-            if negate:
-                code = 0 if code != 0 else 1
+            if args:
+                out, err, code = self._dispatch(args[0], args[1:], stdin)
+                out = out.replace(self.root, "")
+                err = err.replace(self.root, "")
+            else:
+                out, err, code = "", "", 0
 
-            if stdout_file is not None:
-                p = self._resolve(stdout_file)
-                try:
-                    with open(p, stdout_mode, encoding="utf-8") as fh:
-                        if out:
+            if fout is not None:
+                p = self.resolve(fout)
+                if os.path.isdir(p):
+                    err += "bash: " + fout + ": Is a directory\n"
+                    code = 1
+                else:
+                    try:
+                        with open(p, mode, encoding="utf-8") as fh:
                             fh.write(out)
-                            if not out.endswith("\n"):
-                                fh.write("\n")
-                    out = ""
-                except Exception as e:
-                    return "", f"bash: {stdout_file}: {e}\n", 1
+                        out = ""
+                    except OSError as e:
+                        err += "bash: " + fout + ": " + str(e) + "\n"
+                        code = 1
 
+            self.records.append({
+                "name": args[0] if args else "",
+                "args": args[1:],
+                "cwd": cwd_before,
+                "out": out,
+                "err": err,
+                "code": code,
+                "fin": fin,
+                "fout": fout,
+            })
             return out, err, code
 
-        # ─── despacho ───
-        def _dispatch(self, command, args, stdin_content):
-            try:
-                if command == "echo":
-                    text = " ".join(args)
-                    return (text + "\n") if text else "\n", "", 0
-                if command == "pwd":
-                    return self.cwd + "\n", "", 0
-                if command == "cd":
-                    return self._cd(args[0] if args else "~")
-                if command == "ls":
-                    return self._ls(args)
-                if command == "mkdir":
-                    return self._mkdir(args)
-                if command == "cp":
-                    return self._cp(args)
-                if command == "mv":
-                    return self._mv(args)
-                if command == "cat":
-                    return self._cat(args, stdin_content)
-                if command == "rm":
-                    return self._rm(args)
-                if command == "ln":
-                    return self._ln(args)
-                if command == "wc":
-                    return self._wc(args, stdin_content)
-                if command == "md5sum":
-                    return self._md5sum(args, stdin_content)
-                if command == "head":
-                    return self._head_tail(args, stdin_content, "head")
-                if command == "tail":
-                    return self._head_tail(args, stdin_content, "tail")
-                if command == "readlink":
-                    return self._readlink(args)
-                if command == "test":
-                    return self._test(args)
-                return "", f"bash: {command}: command not found\n", 127
-            except Exception as e:
-                return "", f"bash: {command}: {e}\n", 1
+        # ───────── despacho ─────────
+        def _dispatch(self, cmd, a, stdin):
+            table = {
+                "echo": self._echo, "pwd": self._pwd, "cd": self._cd, "ls": self._ls,
+                "mkdir": self._mkdir, "rmdir": self._rmdir, "touch": self._touch,
+                "cp": self._cp, "mv": self._mv, "rm": self._rm, "ln": self._ln,
+                "cat": self._cat, "less": self._cat, "more": self._cat,
+                "wc": self._wc, "md5sum": self._md5sum,
+                "head": self._head, "tail": self._tail,
+                "readlink": self._readlink, "test": self._test,
+            }
+            if cmd in table:
+                return table[cmd](a, stdin)
+            if cmd == "clear":
+                return "", "", 0
+            if cmd in ("nano", "vi", "vim", "pico"):
+                return ("", cmd + ": editor interactivo, no disponible en el navegador.\n"
+                        "Para añadir una línea al final usa:  echo \"texto\" >> archivo\n", 1)
+            if cmd == "help":
+                return ("Comandos: pwd · ls · cd · mkdir · rmdir · touch · cp · mv · rm · ln -s · "
+                        "cat/less/more · head · tail · wc · md5sum · readlink · test · echo\n"
+                        "Operadores: &&  ||  ;  |  <  >  >>\n"), "", 0
+            return "", "bash: " + cmd + ": command not found\n", 127
 
-        # ─── implementación de cada comando ───
-        def _cd(self, target):
-            p = self._resolve(target)
+        # ───────── comandos ─────────
+        def _echo(self, a, stdin):
+            if a and a[0] == "-n":
+                return " ".join(a[1:]), "", 0
+            return " ".join(a) + "\n", "", 0
+
+        def _pwd(self, a, stdin):
+            return self.virt(self.cwd) + "\n", "", 0
+
+        def _cd(self, a, stdin):
+            target = a[0] if a else "~"
+            p = self.resolve(target)
             if os.path.isdir(p):
                 self.cwd = p
                 return "", "", 0
-            return "", f"bash: cd: {target}: No such file or directory\n", 1
+            if os.path.exists(p):
+                return "", "bash: cd: " + target + ": Not a directory\n", 1
+            return "", "bash: cd: " + target + ": No such file or directory\n", 1
 
-        def _ls(self, args):
+        def _ls_entry(self, full, name, long):
+            if not long:
+                return name
+            size = os.lstat(full).st_size
+            if os.path.islink(full):
+                return "lrwxrwxrwx 1 alumno alumno %5d Oct 18 10:00 %s -> %s" % (size, name, os.readlink(full))
+            if os.path.isdir(full):
+                return "drwxr-xr-x 2 alumno alumno %5d Oct 18 10:00 %s" % (4096, name)
+            return "-rw-r--r-- 1 alumno alumno %5d Oct 18 10:00 %s" % (size, name)
+
+        def _ls(self, a, stdin):
             long = False
-            show_hidden = False
+            hidden = False
+            dots = False
             targets = []
-            for a in args:
-                if a in ("-l", "-lh", "-la", "-al", "-ll"):
-                    long = True
-                    if "a" in a:
-                        show_hidden = True
-                elif a in ("-a", "-A"):
-                    show_hidden = True
-                elif a.startswith("-"):
-                    continue
+            for x in a:
+                if x.startswith("-") and len(x) > 1:
+                    if "l" in x:
+                        long = True
+                    if "a" in x:
+                        hidden = True
+                        dots = True
+                    if "A" in x:
+                        hidden = True
                 else:
-                    targets.append(a)
+                    targets.append(x)
             if not targets:
                 targets = ["."]
-
-            lines = []
+            files, dirs, errs, code = [], [], "", 0
             for t in targets:
-                p = self._resolve(t)
-                if not (os.path.exists(p) or os.path.islink(p)):
-                    return "", f"ls: cannot access '{t}': No such file or directory\n", 2
+                p = self.resolve(t)
+                if not os.path.lexists(p):
+                    errs += "ls: cannot access '" + t + "': No such file or directory\n"
+                    code = 2
+                    continue
                 if os.path.isdir(p):
-                    try:
-                        names = sorted(os.listdir(p))
-                    except OSError as e:
-                        return "", f"ls: {e}\n", 1
-                    if not show_hidden:
+                    names = sorted(os.listdir(p))
+                    if not hidden:
                         names = [n for n in names if not n.startswith(".")]
-                    if not names:
-                        continue
-                    for n in names:
-                        full = os.path.join(p, n)
-                        if long:
-                            if os.path.islink(full):
-                                try:
-                                    tgt = os.readlink(full)
-                                except OSError:
-                                    tgt = "?"
-                                lines.append(f"lrwxrwxrwx 1 alumno alumno    ? {n} -> {tgt}")
-                            elif os.path.isdir(full):
-                                lines.append(f"drwxr-xr-x 2 alumno alumno 4096 {n}")
-                            else:
-                                sz = os.path.getsize(full)
-                                lines.append(f"-rw-r--r-- 1 alumno alumno {sz:>4} {n}")
-                        else:
-                            lines.append(n)
+                    if dots:
+                        names = [".", ".."] + names
+                    lines = [self._ls_entry(os.path.join(p, n), n, long) for n in names]
+                    dirs.append((t, lines))
                 else:
-                    lines.append(t)
-            return "\n".join(lines) + ("\n" if lines else ""), "", 0
+                    files.append(self._ls_entry(p, t, long))
+            blocks = []
+            if files:
+                blocks.append("\n".join(files))
+            for t, lines in dirs:
+                body = "\n".join(lines)
+                if len(targets) > 1:
+                    body = t + ":\n" + body
+                if body:
+                    blocks.append(body)
+            out = "\n\n".join(blocks)
+            return (out + "\n" if out else ""), errs, code
 
-        def _mkdir(self, args):
-            made = False
-            for a in args:
-                if a.startswith("-"):
-                    continue
-                p = self._resolve(a)
+        def _mkdir(self, a, stdin):
+            parents = any(x.startswith("-") and "p" in x for x in a)
+            err, code = "", 0
+            for x in [y for y in a if not y.startswith("-")]:
+                p = self.resolve(x)
                 try:
-                    os.makedirs(p, exist_ok=False)
-                    made = True
-                except FileExistsError:
-                    return "", f"mkdir: cannot create directory '{a}': File exists\n", 1
-                except OSError as e:
-                    return "", f"mkdir: {e}\n", 1
-            return "", "", 0 if made or args else 1
-
-        def _cp(self, args):
-            if len(args) < 2:
-                return "", "cp: missing operand\n", 1
-            srcs, dst = args[:-1], args[-1]
-            dst_p = self._resolve(dst)
-            dst_is_dir = os.path.isdir(dst_p)
-            if len(srcs) > 1 and not dst_is_dir:
-                return "", f"cp: target '{dst}' is not a directory\n", 1
-            for s in srcs:
-                src_p = self._resolve(s)
-                if not os.path.exists(src_p):
-                    return "", f"cp: cannot stat '{s}': No such file or directory\n", 1
-                target = os.path.join(dst_p, os.path.basename(src_p)) if dst_is_dir else dst_p
-                try:
-                    with open(src_p, "rb") as fi, open(target, "wb") as fo:
-                        fo.write(fi.read())
-                except Exception as e:
-                    return "", f"cp: {e}\n", 1
-            return "", "", 0
-
-        def _mv(self, args):
-            if len(args) < 2:
-                return "", "mv: missing operand\n", 1
-            src = self._resolve(args[0])
-            dst = self._resolve(args[1])
-            if not (os.path.exists(src) or os.path.islink(src)):
-                return "", f"mv: cannot stat '{args[0]}': No such file or directory\n", 1
-            target = os.path.join(dst, os.path.basename(src)) if os.path.isdir(dst) else dst
-            try:
-                os.rename(src, target)
-            except Exception as e:
-                return "", f"mv: {e}\n", 1
-            return "", "", 0
-
-        def _cat(self, args, stdin_content):
-            if not args and stdin_content is not None:
-                return stdin_content.decode("utf-8", errors="replace"), "", 0
-            outs = []
-            for a in args:
-                p = self._resolve(a)
-                try:
-                    with open(p, "rb") as fh:
-                        outs.append(fh.read().decode("utf-8", errors="replace"))
-                except FileNotFoundError:
-                    return "", f"cat: {a}: No such file or directory\n", 1
-                except OSError as e:
-                    return "", f"cat: {a}: {e}\n", 1
-            return "".join(outs), "", 0
-
-        def _rm(self, args):
-            recursive = False
-            targets = []
-            for a in args:
-                if a in ("-r", "-R", "-rf", "-fr", "-fR", "-Rf"):
-                    recursive = True
-                elif a.startswith("-"):
-                    continue
-                else:
-                    targets.append(a)
-            for t in targets:
-                p = self._resolve(t)
-                try:
-                    if os.path.islink(p):
-                        os.unlink(p)
-                    elif os.path.isdir(p):
-                        if not recursive:
-                            return "", f"rm: cannot remove '{t}': Is a directory\n", 1
-                        shutil.rmtree(p)
-                    elif os.path.exists(p):
-                        os.remove(p)
+                    if parents:
+                        os.makedirs(p, exist_ok=True)
                     else:
-                        return "", f"rm: cannot remove '{t}': No such file or directory\n", 1
+                        os.mkdir(p)
+                except FileExistsError:
+                    err += "mkdir: cannot create directory '" + x + "': File exists\n"
+                    code = 1
+                except FileNotFoundError:
+                    err += "mkdir: cannot create directory '" + x + "': No such file or directory\n"
+                    code = 1
                 except OSError as e:
-                    return "", f"rm: {e}\n", 1
+                    err += "mkdir: " + str(e) + "\n"
+                    code = 1
+            if not [y for y in a if not y.startswith("-")]:
+                return "", "mkdir: missing operand\n", 1
+            return "", err, code
+
+        def _rmdir(self, a, stdin):
+            err, code = "", 0
+            for x in [y for y in a if not y.startswith("-")]:
+                try:
+                    os.rmdir(self.resolve(x))
+                except OSError:
+                    err += "rmdir: failed to remove '" + x + "': Directory not empty or not found\n"
+                    code = 1
+            return "", err, code
+
+        def _touch(self, a, stdin):
+            for x in [y for y in a if not y.startswith("-")]:
+                with open(self.resolve(x), "a"):
+                    pass
             return "", "", 0
 
-        def _ln(self, args):
-            symbolic = False
-            rest = []
-            for a in args:
-                if a == "-s":
-                    symbolic = True
-                elif a.startswith("-"):
+        def _cp(self, a, stdin):
+            rec = any(x.startswith("-") and ("r" in x or "R" in x or "a" in x) for x in a)
+            args = [x for x in a if not x.startswith("-")]
+            if len(args) < 2:
+                return "", "cp: missing file operand\n", 1
+            srcs, dst = args[:-1], args[-1]
+            dst_p = self.resolve(dst)
+            dst_dir = os.path.isdir(dst_p)
+            if len(srcs) > 1 and not dst_dir:
+                return "", "cp: target '" + dst + "' is not a directory\n", 1
+            err, code = "", 0
+            for s in srcs:
+                sp = self.resolve(s)
+                if not os.path.exists(sp):
+                    err += "cp: cannot stat '" + s + "': No such file or directory\n"
+                    code = 1
                     continue
-                else:
-                    rest.append(a)
-            if len(rest) < 2:
-                return "", "ln: missing operand\n", 1
-            target, link_name = rest[0], rest[1]
-            link_p = self._resolve(link_name)
-            try:
-                if symbolic:
-                    os.symlink(target, link_p)
-                else:
-                    os.link(self._resolve(target), link_p)
-            except FileExistsError:
-                return "", f"ln: failed to create {'symbolic ' if symbolic else ''}link '{link_name}': File exists\n", 1
-            except OSError as e:
-                return "", f"ln: {e}\n", 1
-            return "", "", 0
-
-        def _wc(self, args, stdin_content):
-            count_l = False
-            targets = []
-            for a in args:
-                if a == "-l":
-                    count_l = True
-                elif a.startswith("-"):
+                target = os.path.join(dst_p, os.path.basename(sp)) if dst_dir else dst_p
+                if os.path.abspath(sp) == os.path.abspath(target):
+                    err += "cp: '" + s + "' and '" + dst + "' are the same file\n"
+                    code = 1
                     continue
-                else:
-                    targets.append(a)
+                try:
+                    if os.path.isdir(sp):
+                        if not rec:
+                            err += "cp: -r not specified; omitting directory '" + s + "'\n"
+                            code = 1
+                            continue
+                        shutil.copytree(sp, target)
+                    else:
+                        shutil.copyfile(sp, target)
+                except OSError as e:
+                    err += "cp: " + str(e) + "\n"
+                    code = 1
+            return "", err, code
 
-            def fmt(content, name=None):
-                n = content.count(b"\n")
-                if count_l:
-                    return f"{n}" + (f" {name}" if name else "")
-                return f"{n} {len(content.split())} {len(content)}" + (f" {name}" if name else "")
+        def _mv(self, a, stdin):
+            args = [x for x in a if not x.startswith("-")]
+            if len(args) < 2:
+                return "", "mv: missing file operand\n", 1
+            srcs, dst = args[:-1], args[-1]
+            dst_p = self.resolve(dst)
+            dst_dir = os.path.isdir(dst_p)
+            if len(srcs) > 1 and not dst_dir:
+                return "", "mv: target '" + dst + "' is not a directory\n", 1
+            err, code = "", 0
+            for s in srcs:
+                sp = self.resolve(s)
+                if not os.path.lexists(sp):
+                    err += "mv: cannot stat '" + s + "': No such file or directory\n"
+                    code = 1
+                    continue
+                target = os.path.join(dst_p, os.path.basename(sp)) if dst_dir else dst_p
+                if os.path.abspath(sp) == os.path.abspath(target):
+                    err += "mv: '" + s + "' and '" + dst + "' are the same file\n"
+                    code = 1
+                    continue
+                try:
+                    shutil.move(sp, target)
+                except OSError as e:
+                    err += "mv: " + str(e) + "\n"
+                    code = 1
+            return "", err, code
 
-            if not targets and stdin_content is not None:
-                return fmt(stdin_content) + "\n", "", 0
+        def _read(self, name):
+            p = self.resolve(name)
+            if os.path.isdir(p):
+                raise IsADirectoryError(name)
+            with open(p, "rb") as fh:
+                return fh.read().decode("utf-8", errors="replace")
 
-            outs = []
+        def _cat(self, a, stdin):
+            names = [x for x in a if not x.startswith("-")]
+            if not names and stdin is not None:
+                return stdin.decode("utf-8", errors="replace"), "", 0
+            out, err, code = "", "", 0
+            for n in names:
+                try:
+                    out += self._read(n)
+                except IsADirectoryError:
+                    err += "cat: " + n + ": Is a directory\n"
+                    code = 1
+                except FileNotFoundError:
+                    err += "cat: " + n + ": No such file or directory\n"
+                    code = 1
+                except OSError as e:
+                    err += "cat: " + n + ": " + oserr_text(e) + "\n"
+                    code = 1
+            return out, err, code
+
+        def _rm(self, a, stdin):
+            rec = any(x.startswith("-") and ("r" in x or "R" in x) for x in a)
+            force = any(x.startswith("-") and "f" in x for x in a)
+            targets = [x for x in a if not x.startswith("-")]
+            if not targets:
+                return "", "rm: missing operand\n", 1
+            err, code = "", 0
             for t in targets:
-                p = self._resolve(t)
+                p = self.resolve(t)
                 try:
-                    with open(p, "rb") as fh:
-                        content = fh.read()
-                except FileNotFoundError:
-                    return "", f"wc: {t}: No such file or directory\n", 1
-                outs.append(fmt(content, t))
-            return "\n".join(outs) + "\n", "", 0
+                    if os.path.islink(p) or os.path.isfile(p):
+                        os.remove(p)
+                    elif os.path.isdir(p):
+                        if rec:
+                            shutil.rmtree(p)
+                        else:
+                            err += "rm: cannot remove '" + t + "': Is a directory\n"
+                            code = 1
+                    elif not force:
+                        err += "rm: cannot remove '" + t + "': No such file or directory\n"
+                        code = 1
+                except OSError as e:
+                    err += "rm: " + str(e) + "\n"
+                    code = 1
+            return "", err, code
 
-        def _md5sum(self, args, stdin_content):
-            if not args and stdin_content is not None:
-                return f"{hashlib.md5(stdin_content).hexdigest()}  -\n", "", 0
-            outs = []
-            for t in args:
-                p = self._resolve(t)
-                try:
-                    with open(p, "rb") as fh:
-                        content = fh.read()
-                except FileNotFoundError:
-                    return "", f"md5sum: {t}: No such file or directory\n", 1
-                outs.append(f"{hashlib.md5(content).hexdigest()}  {t}")
-            return "\n".join(outs) + ("\n" if outs else ""), "", 0
-
-        def _head_tail(self, args, stdin_content, mode):
-            n = 10
-            targets = []
-            i = 0
-            while i < len(args):
-                a = args[i]
-                if a == "-n" and i + 1 < len(args):
+        def _ln(self, a, stdin):
+            symbolic = any(x.startswith("-") and "s" in x for x in a)
+            force = any(x.startswith("-") and "f" in x for x in a)
+            rest = [x for x in a if not x.startswith("-")]
+            if len(rest) < 2:
+                return "", "ln: missing file operand\n", 1
+            target, name = rest[0], rest[1]
+            link_p = self.resolve(name)
+            if os.path.isdir(link_p) and not os.path.islink(link_p):
+                link_p = os.path.join(link_p, os.path.basename(target.rstrip("/")))
+            kind = "symbolic link" if symbolic else "hard link"
+            try:
+                if force and os.path.lexists(link_p):
+                    os.remove(link_p)
+                if symbolic:
+                    real_target = (self.root + target) if target.startswith("/") else target
+                    os.symlink(real_target, link_p)
+                else:
+                    src = self.resolve(target)
                     try:
-                        n = int(args[i + 1])
+                        os.link(src, link_p)
+                    except (OSError, NotImplementedError, AttributeError):
+                        shutil.copyfile(src, link_p)  # respaldo si el sistema no admite enlaces duros
+            except FileExistsError:
+                return "", "ln: failed to create " + kind + " '" + name + "': File exists\n", 1
+            except OSError as e:
+                return "", "ln: " + str(e) + "\n", 1
+            return "", "", 0
+
+        def _wc(self, a, stdin):
+            flags = "".join(x[1:] for x in a if x.startswith("-"))
+            names = [x for x in a if not x.startswith("-")]
+
+            def fmt(data, name):
+                nl = data.count(b"\n")
+                nw = len(data.split())
+                nc = len(data)
+                parts = []
+                if not flags:
+                    parts = [nl, nw, nc]
+                else:
+                    if "l" in flags:
+                        parts.append(nl)
+                    if "w" in flags:
+                        parts.append(nw)
+                    if "c" in flags:
+                        parts.append(nc)
+                s = " ".join(str(x) for x in parts)
+                return s + (" " + name if name else "")
+
+            if not names and stdin is not None:
+                return fmt(stdin, "") + "\n", "", 0
+            lines = []
+            for n in names:
+                try:
+                    with open(self.resolve(n), "rb") as fh:
+                        lines.append(fmt(fh.read(), n))
+                except OSError:
+                    return "", "wc: " + n + ": No such file or directory\n", 1
+            return "\n".join(lines) + "\n", "", 0
+
+        def _md5sum(self, a, stdin):
+            names = [x for x in a if not x.startswith("-")]
+            if not names and stdin is not None:
+                return hashlib.md5(stdin).hexdigest() + "  -\n", "", 0
+            out = ""
+            for n in names:
+                try:
+                    with open(self.resolve(n), "rb") as fh:
+                        out += hashlib.md5(fh.read()).hexdigest() + "  " + n + "\n"
+                except OSError:
+                    return out, "md5sum: " + n + ": No such file or directory\n", 1
+            return out, "", 0
+
+        def _head_tail(self, a, stdin, mode):
+            n = 10
+            names = []
+            i = 0
+            while i < len(a):
+                x = a[i]
+                if x == "-n" and i + 1 < len(a):
+                    try:
+                        n = int(a[i + 1])
                     except ValueError:
                         pass
                     i += 2
                     continue
-                if a.startswith("-n") and len(a) > 2:
+                if x.startswith("-n") and len(x) > 2:
                     try:
-                        n = int(a[2:])
+                        n = int(x[2:])
                     except ValueError:
                         pass
-                elif a.startswith("-") and a[1:].isdigit():
-                    n = int(a[1:])
-                elif a.startswith("-"):
+                elif x.startswith("-") and x[1:].isdigit():
+                    n = int(x[1:])
+                elif x.startswith("-"):
                     pass
                 else:
-                    targets.append(a)
+                    names.append(x)
                 i += 1
 
-            def process(text):
-                lines = text.splitlines(keepends=True)
-                return "".join(lines[:n] if mode == "head" else (lines[-n:] if n > 0 else []))
+            def cut(text):
+                ls = text.splitlines(keepends=True)
+                if mode == "head":
+                    return "".join(ls[:n])
+                return "".join(ls[-n:]) if n > 0 else ""
 
-            if not targets and stdin_content is not None:
-                return process(stdin_content.decode("utf-8", errors="replace")), "", 0
-
-            outs = []
-            for idx, t in enumerate(targets):
-                p = self._resolve(t)
+            if not names and stdin is not None:
+                return cut(stdin.decode("utf-8", errors="replace")), "", 0
+            out, err, code = "", "", 0
+            for idx, nm in enumerate(names):
                 try:
-                    with open(p, "rb") as fh:
-                        text = fh.read().decode("utf-8", errors="replace")
-                except FileNotFoundError:
-                    return "", f"{mode}: cannot open '{t}' for reading: No such file or directory\n", 1
-                if len(targets) > 1:
-                    if idx > 0:
-                        outs.append("")
-                    outs.append(f"==> {t} <==")
-                outs.append(process(text))
-            return "\n".join(outs) + ("" if not outs else ""), "", 0
-
-        def _readlink(self, args):
-            outs = []
-            for a in args:
-                if a.startswith("-"):
+                    text = self._read(nm)
+                except IsADirectoryError:
+                    err += mode + ": error reading '" + nm + "': Is a directory\n"
+                    code = 1
                     continue
-                p = self._resolve(a)
-                if not os.path.islink(p):
-                    return "", f"readlink: {a}: Invalid argument\n", 1
-                outs.append(os.readlink(p))
-            return ("\n".join(outs) + "\n") if outs else "", "", 0
+                except OSError as e:
+                    err += mode + ": cannot open '" + nm + "' for reading: " + oserr_text(e) + "\n"
+                    code = 1
+                    continue
+                if len(names) > 1:
+                    out += ("\n" if idx > 0 else "") + "==> " + nm + " <==\n"
+                body = cut(text)
+                out += body if body.endswith("\n") or not body else body + "\n"
+            return out, err, code
 
-        def _test(self, args):
-            if not args:
-                return "", "", 1
-            op, rest = args[0], args[1:]
-            if op in ("-e", "-f", "-d", "-L", "-h") and rest:
-                p = self._resolve(rest[0])
-                checks = {
-                    "-e": os.path.exists,
-                    "-f": os.path.isfile,
-                    "-d": os.path.isdir,
-                    "-L": os.path.islink,
-                    "-h": os.path.islink,
-                }
-                return "", "", 0 if checks[op](p) else 1
-            return "", "", 1
+        def _head(self, a, stdin):
+            return self._head_tail(a, stdin, "head")
 
-        # ─── helpers de presentación ───
-        def out(self, cmd):
-            """Solo stdout, sin espacios sobrantes (para las comprobaciones)."""
-            return self.run(cmd)[0].strip()
+        def _tail(self, a, stdin):
+            return self._head_tail(a, stdin, "tail")
 
-        def sh(self, script, max_lines=12):
-            """Ejecuta una orden por línea y devuelve la 'sesión' formateada."""
-            blocks = []
-            for line in [l for l in script.strip().splitlines() if l.strip()]:
-                prompt = self.prompt  # prompt ANTES de ejecutar
-                out, err = self.run(line)
-                lines = out.splitlines()
-                if len(lines) > max_lines:
-                    lines = lines[:max_lines] + [f"… ({len(lines) - max_lines} líneas más)"]
-                lines += [f"[stderr] {l}" for l in err.splitlines()]
-                body = "\n".join(lines)
-                blocks.append(f"{prompt} {line}" + (f"\n{body}" if body else ""))
-            return mo.md("```console\n" + "\n".join(blocks) + "\n```")
+        def _readlink(self, a, stdin):
+            full = any(x.startswith("-") and "f" in x for x in a)
+            out = ""
+            for n in [x for x in a if not x.startswith("-")]:
+                p = self.resolve(n)
+                if full:
+                    out += os.path.realpath(p) + "\n"
+                elif os.path.islink(p):
+                    out += os.readlink(p) + "\n"
+                else:
+                    return out, "", 1
+            return out, "", 0
 
-    term = Terminal(HOME)
+        def _test(self, a, stdin):
+            neg = False
+            if a and a[0] == "!":
+                neg = True
+                a = a[1:]
+            fns = {"-e": os.path.exists, "-f": os.path.isfile, "-d": os.path.isdir,
+                   "-L": os.path.islink, "-h": os.path.islink}
+            ok = False
+            if len(a) == 2 and a[0] in fns:
+                ok = fns[a[0]](self.resolve(a[1]))
+            return "", "", (0 if ok != neg else 1)
 
-    def check(label, cond):
-        return mo.callout(
-            mo.md(("✔ " if cond else "✘ ") + label),
-            kind="success" if cond else "danger",
+
+    # ═════════════════════ Laboratorio y sesiones ═════════════════════
+    def norm_seed(seed):
+        s = dict(seed or {})
+        if "Secuencias.txt" not in s:
+            s["Secuencias.txt"] = DEMO_SEQ.encode("utf-8")
+        return s
+
+
+    def build_lab(seed, upto=0):
+        """Crea un laboratorio nuevo y aplica las soluciones de los primeros `upto` ejercicios."""
+        root = tempfile.mkdtemp(prefix="lab1_")
+        t = Terminal(root)
+        tema1 = os.path.join(t.home, "Tema1")
+        os.makedirs(tema1)
+        for name, data in norm_seed(seed).items():
+            with open(os.path.join(tema1, os.path.basename(name)), "wb") as fh:
+                fh.write(data)
+        for k in range(upto):
+            for line in SOLUTIONS[k]:
+                t.run_line(line)
+        t.records = []
+        return t
+
+
+    def start_prompt(n, seed=None):
+        t = build_lab(seed, n - 1)
+        try:
+            return t.prompt
+        finally:
+            shutil.rmtree(t.root, ignore_errors=True)
+
+
+    def run_session(t, text, max_lines=30):
+        blocks = []
+        for raw in text.splitlines():
+            line = raw.strip()
+            if not line:
+                continue
+            prompt = t.prompt
+            if line.startswith("#"):
+                blocks.append(prompt + " " + line)
+                continue
+            out, err, code = t.run_line(line)
+            body = (out + err).rstrip("\n")
+            lines = body.splitlines() if body else []
+            if len(lines) > max_lines:
+                lines = lines[:max_lines] + ["… (" + str(len(lines) - max_lines) + " líneas más)"]
+            blocks.append(prompt + " " + line + ("\n" + "\n".join(lines) if lines else ""))
+        return "\n".join(blocks).replace("```", "'''")
+
+
+    # ═════════════════════ Comprobaciones ═════════════════════
+    def lab_paths(t):
+        t1 = os.path.join(t.home, "Tema1")
+        d = os.path.join(t1, "Datos")
+        return {
+            "T1": t1,
+            "D": d,
+            "O": os.path.join(t1, "Secuencias.txt"),
+            "A": os.path.join(d, "aminoacidos.tt"),
+            "L": os.path.join(d, "Secuencias.txt"),
+        }
+
+
+    def rd(path):
+        with open(path, "rb") as fh:
+            return fh.read()
+
+
+    def md5(path):
+        return hashlib.md5(rd(path)).hexdigest()
+
+
+    def reads(t, target, names=READERS):
+        for r in t.records:
+            if r["name"] in names and r["out"]:
+                for x in r["args"]:
+                    if not x.startswith("-") and t.resolve(x, r["cwd"]) == target:
+                        return True
+                if r["fin"] and t.resolve(r["fin"], r["cwd"]) == target:
+                    return True
+        return False
+
+
+    def ck_1(t, P, orig):
+        pw = [r for r in t.records if r["name"] == "pwd"]
+        return [
+            ("Ejecutaste `pwd`", bool(pw), "El comando que imprime el directorio de trabajo es `pwd`."),
+            ("La salida es una ruta absoluta (empieza por `/`)",
+             any(r["out"].startswith("/") for r in pw), None),
+        ]
+
+
+    def ck_2(t, P, orig):
+        ls = [r for r in t.records if r["name"] == "ls"]
+        return [
+            ("Ejecutaste `ls`", bool(ls), "`ls` = list."),
+            ("Aparece la carpeta `Tema1`", any("Tema1" in r["out"].split() for r in ls), None),
+        ]
+
+
+    def ck_3(t, P, orig):
+        return [("Ahora estás dentro de `Tema1`", t.cwd == P["T1"],
+                 "Terminaste en `" + t.virt(t.cwd) + "`. Usa `cd Tema1`.")]
+
+
+    def ck_4(t, P, orig):
+        names = os.listdir(P["T1"])
+        tip = None
+        if any(n.lower() == "datos" and n != "Datos" for n in names):
+            tip = "Linux distingue mayúsculas: la carpeta debe llamarse exactamente `Datos`."
+        return [("Existe la carpeta `Tema1/Datos`", os.path.isdir(P["D"]), tip or "Usa `mkdir Datos`.")]
+
+
+    def ck_5(t, P, orig):
+        ok = os.path.isfile(P["L"]) and not os.path.islink(P["L"])
+        return [
+            ("Existe la copia `Datos/Secuencias.txt`", ok, "Sintaxis: `cp ORIGEN DESTINO`. Estás en `~/Tema1`."),
+            ("La copia es idéntica al original (mismo md5)",
+             ok and os.path.isfile(P["O"]) and md5(P["L"]) == md5(P["O"]), None),
+            ("El original sigue en `Tema1`", os.path.isfile(P["O"]),
+             "Con `cp` el original no desaparece. ¿Usaste `mv`?"),
+        ]
+
+
+    def ck_6(t, P, orig):
+        names = sorted(os.listdir(P["D"])) if os.path.isdir(P["D"]) else []
+        same = os.path.isfile(P["A"]) and os.path.isfile(P["O"]) and md5(P["A"]) == md5(P["O"])
+        return [
+            ("En `Datos` solo queda `aminoacidos.tt`", names == ["aminoacidos.tt"],
+             "Contenido actual de `Datos`: " + (", ".join(names) or "(vacío)")),
+            ("Mismo contenido que el original (md5): renombrar no cambia los datos", same,
+             "`mv ORIGEN DESTINO` renombra. Hazlo sobre la copia de `Datos`, no sobre el original."),
+        ]
+
+
+    def ck_7(t, P, orig):
+        return [("Leíste `aminoacidos.tt` con `cat`, `less`, `more`, `head` o `tail`",
+                 reads(t, P["A"]), "Estás en `Datos`: prueba `cat aminoacidos.tt`.")]
+
+
+    def ck_8(t, P, orig):
+        islk = os.path.islink(P["L"])
+        works = (islk and os.path.exists(P["L"])
+                 and os.path.realpath(P["L"]) == os.path.realpath(P["O"]))
+        tip = "Crea el enlace con `ln -s DESTINO NOMBRE`."
+        if islk and not works:
+            tip = ("El enlace existe pero está **roto**: la ruta del destino se interpreta desde la "
+                   "carpeta donde vive el enlace. El original está un nivel por encima → `../Secuencias.txt`. "
+                   "Vuelve a escribir todos los comandos (se parte de cero).")
+        return [
+            ("Existe el enlace simbólico `Datos/Secuencias.txt`", islk, "Crea el enlace con `ln -s DESTINO NOMBRE`."),
+            ("El enlace funciona (apunta al original, no está roto)", works, tip),
+        ]
+
+
+    def ck_9(t, P, orig):
+        ok = reads(t, P["L"])
+        text = orig.decode("utf-8", errors="replace")
+        same = any(
+            r["name"] in READERS and r["out"].rstrip("\n") in text
+            for r in t.records if r["out"] and ok
         )
+        return [
+            ("Leíste el enlace `Secuencias.txt` (no `../Secuencias.txt`)", ok,
+             "Estás en `Datos`: `cat Secuencias.txt` lee el enlace."),
+            ("Ves el contenido del original a través del enlace", same, None),
+        ]
 
-    return check, term
+
+    def ck_10(t, P, orig):
+        new = rd(P["O"]) if os.path.isfile(P["O"]) else b""
+        added = new.startswith(orig) and len(new) > len(orig)
+        text_added = new[len(orig):].decode("utf-8", errors="replace").strip() if added else ""
+        tip = "Usa `echo \"texto\" >> archivo` (con `>>`, que añade; un solo `>` sobrescribe)."
+        if any(r["name"] in ("nano", "vi", "vim") for r in t.records):
+            tip = "nano no se puede usar dentro del navegador: emúlalo con `echo \"...\" >> Secuencias.txt`."
+        elif new and not new.startswith(orig):
+            tip = "El original ha cambiado de forma distinta a añadir una línea. ¿Usaste `>` en lugar de `>>`?"
+        copy_ok = os.path.isfile(P["A"]) and md5(P["A"]) == hashlib.md5(orig).hexdigest()
+        link_ok = os.path.islink(P["L"]) and os.path.exists(P["L"]) and rd(P["L"]) == new
+        reread = bool(text_added) and any(
+            r["name"] in READERS and text_added in r["out"] for r in t.records)
+        return [
+            ("El original (`Tema1/Secuencias.txt`) tiene una línea nueva al final", added, tip),
+            ("Volviste a leer el original y se ve la línea nueva", reread,
+             "Léelo después de editarlo: `cat Secuencias.txt` o `tail Secuencias.txt` (desde `Tema1`)."),
+            ("La copia `aminoacidos.tt` NO cambió (es independiente)", copy_ok, None),
+            ("El enlace `Datos/Secuencias.txt` SÍ muestra la línea nueva (apunta al original)", link_ok, None),
+        ]
 
 
-# ═════════════════════════ 1 · pwd ═════════════════════════
+    def ck_11(t, P, orig):
+        return [
+            ("`aminoacidos.tt` ya no existe", not os.path.lexists(P["A"]),
+             "Desde `Tema1`: `rm Datos/aminoacidos.tt`."),
+            ("El original sigue intacto", os.path.isfile(P["O"]), "¡Has borrado el original!"),
+            ("El enlace simbólico sigue funcionando", os.path.islink(P["L"]) and os.path.exists(P["L"]),
+             "Solo debías borrar la copia."),
+        ]
+
+
+    CHECKS = {1: ck_1, 2: ck_2, 3: ck_3, 4: ck_4, 5: ck_5, 6: ck_6,
+              7: ck_7, 8: ck_8, 9: ck_9, 10: ck_10, 11: ck_11}
+
+
+    def run_exercise(n, text, seed=None):
+        """Ejecuta los comandos del alumno desde el estado correcto del ejercicio n y los valida."""
+        t = build_lab(seed, n - 1)
+        try:
+            P = lab_paths(t)
+            orig = rd(P["O"])
+            transcript = run_session(t, text)
+            checks = CHECKS[n](t, P, orig)
+        finally:
+            shutil.rmtree(t.root, ignore_errors=True)
+        return {"transcript": transcript, "checks": checks}
+
+
+    def run_free(text, seed=None, upto=0):
+        """Terminal libre: ejecuta el guion desde un laboratorio nuevo (con `upto` ejercicios ya hechos)."""
+        t = build_lab(seed, upto)
+        try:
+            return run_session(t, text, max_lines=60)
+        finally:
+            shutil.rmtree(t.root, ignore_errors=True)
+
+    return SOLUTIONS, run_exercise, run_free, start_prompt
+
+
+# ═════════════════════════ Helpers de interfaz ═════════════════════════
 @app.cell(hide_code=True)
-def _(mo):
-    mo.md(
-        r"""
-        ---
-        ## 1 · ¿En qué ruta estoy?
-        > *Identifica la ruta completa en la que te encuentras una vez que has iniciado la terminal.*
+def _(SOLUTIONS, mo, start_prompt):
+    def console_block(text):
+        return mo.md("```console\n" + text + "\n```")
 
-        **Pista:** `pwd` = *print working directory*. Imprime la **ruta absoluta** del directorio
-        actual (en Linux empieza siempre por `/`). En tu ordenador la ruta será distinta.
-        """
-    )
-    return
+    def exercise_card(n, titulo, enunciado, concepto, pista, form):
+        sol = "\n".join(SOLUTIONS[n - 1])
+        return mo.vstack([
+            mo.md("---\n## " + str(n) + " · " + titulo + "\n> *" + enunciado + "*\n\n" + concepto),
+            mo.md("📍 Partes de: `" + start_prompt(n) + "`"),
+            form,
+            mo.accordion({
+                "💡 Pista": mo.md(pista),
+                "✅ Solución de referencia": mo.md("```bash\n" + sol + "\n```"),
+            }),
+        ])
+
+    def render_result(res):
+        parts = [console_block(res["transcript"])]
+        for label, good, tip in res["checks"]:
+            msg = ("✔ " if good else "✘ ") + label
+            if (not good) and tip:
+                msg += "\n\n💡 " + tip
+            parts.append(mo.callout(mo.md(msg), kind="success" if good else "danger"))
+        done = all(c[1] for c in res["checks"])
+        parts.append(mo.callout(
+            mo.md("🎉 **¡Ejercicio completado!**" if done
+                  else "Revisa los puntos marcados con ✘, corrige y vuelve a pulsar **▶ Ejecutar**."),
+            kind="success" if done else "warn",
+        ))
+        return mo.vstack(parts)
+
+    return console_block, exercise_card, render_result
 
 
-@app.cell
-def _(check, mo, term):
-    _s = term.sh("pwd")
-    e1 = mo.vstack([
-        _s,
-        check("la ruta es absoluta (empieza por `/`)", term.out("pwd").startswith("/")),
-    ])
-    e1
-    return (e1,)
-
-
-# ═════════════════════════ 2 · ls ═════════════════════════
+# ═════════════════════════ 1 · ¿En qué ruta estoy? ═════════════════════════
 @app.cell(hide_code=True)
-def _(e1, mo):
-    e1
-    mo.md(
-        r"""
-        ---
-        ## 2 · Listar archivos y carpetas
-        > *Genera el listado de archivos y carpetas que se encuentran en la posición en la que te encuentras.*
-
-        **Pista:** `ls` = *list*. Variantes: `ls -l` (formato largo: permisos, dueño, tamaño, fecha),
-        `ls -a` (incluye ocultos), `ls -lh` (tamaños legibles).
-        Verás **una sola carpeta: `Tema1`** (todavía no hemos entrado en ella).
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e1, mo, term):
-    e1
-    e2 = mo.vstack([
-        term.sh("ls"),
-        check("aparece la carpeta `Tema1`", "Tema1" in term.out("ls").split()),
-    ])
-    e2
-    return (e2,)
-
-
-# ═════════════════════════ 3 · cd ═════════════════════════
-@app.cell(hide_code=True)
-def _(e2, mo):
-    e2
-    mo.md(
-        r"""
-        ---
-        ## 3 · Entrar en la carpeta `Tema1`
-        > *Navega hasta dentro de la carpeta descargada como Tema1.*
-
-        **Pista:** `cd` = *change directory*. Fíjate en que **el prompt cambia** (`~` → `~/Tema1`).
-        Atajos: `.` = aquí · `..` = carpeta superior · `~` = tu carpeta personal.
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e2, mo, term):
-    e2
-    _s = term.sh("cd Tema1\npwd\nls")
-    e3 = mo.vstack([
-        _s,
-        check("ahora estamos dentro de `Tema1`", term.out("pwd").endswith("/Tema1")),
-    ])
-    e3
-    return (e3,)
-
-
-# ═════════════════════════ 4 · mkdir ═════════════════════════
-@app.cell(hide_code=True)
-def _(e3, mo):
-    e3
-    mo.md(
-        r"""
-        ---
-        ## 4 · Crear la carpeta `Datos`
-        > *Crea una nueva carpeta denominada "Datos".*
-
-        **Pista:** `mkdir` = *make directory*. Si dudas: `mkdir --help`. Linux distingue
-        mayúsculas: `Datos` ≠ `datos`.
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e3, mo, term):
-    e3
-    e4 = mo.vstack([
-        term.sh("mkdir Datos\nls"),
-        check("existe la carpeta `Datos`", term.out("test -d Datos && echo si") == "si"),
-    ])
-    e4
-    return (e4,)
-
-
-# ═════════════════════════ 5 · cp ═════════════════════════
-@app.cell(hide_code=True)
-def _(e4, mo):
-    e4
-    mo.md(
-        r"""
-        ---
-        ## 5 · Copiar `Secuencias.txt` dentro de `Datos`
-        > *Haz una copia del archivo Secuencias.txt dentro de la nueva carpeta "Datos".*
-
-        **Pista:** `cp ORIGEN DESTINO`. Si el destino es una carpeta, el archivo conserva su
-        nombre. Una **copia es un archivo nuevo e independiente**. Lo comprobamos con
-        `md5sum`: mismo contenido ⇒ mismo código.
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e4, mo, term):
-    e4
-    _s = term.sh("cp Secuencias.txt Datos/\nls Datos\nmd5sum Secuencias.txt Datos/Secuencias.txt")
-    _a = term.out("md5sum < Secuencias.txt")
-    _b = term.out("md5sum < Datos/Secuencias.txt")
-    e5 = mo.vstack([
-        _s,
-        check("la copia existe y es idéntica (mismo md5)", bool(_a) and _a == _b),
-    ])
-    e5
-    return (e5,)
-
-
-# ═════════════════════════ 6 · mv ═════════════════════════
-@app.cell(hide_code=True)
-def _(e5, mo):
-    e5
-    mo.md(
-        r"""
-        ---
-        ## 6 · Renombrar la copia a `aminoacidos.tt`
-        > *Cambia el nombre del archivo Secuencias.txt y denomínalo "aminoacidos.tt".*
-
-        **Pista:** `mv ORIGEN DESTINO` sirve para **mover y para renombrar**. Entramos en `Datos`
-        para renombrar **la copia** (no el original). Cambiar el nombre **no cambia el
-        contenido** — el md5 es el mismo.
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e5, mo, term):
-    e5
-    _s = term.sh("cd Datos\nmv Secuencias.txt aminoacidos.tt\nls\nmd5sum aminoacidos.tt ../Secuencias.txt")
-    _a = term.out("md5sum < aminoacidos.tt")
-    _b = term.out("md5sum < ../Secuencias.txt")
-    e6 = mo.vstack([
-        _s,
-        check("`aminoacidos.tt` existe, `Secuencias.txt` ya no está en `Datos`",
-              term.out("ls") == "aminoacidos.tt"),
-        check("el contenido no ha cambiado (md5 idéntico al original)", _a == _b),
-    ])
-    e6
-    return (e6,)
-
-
-# ═════════════════════════ 7 · cat / less ═════════════════════════
-@app.cell(hide_code=True)
-def _(e6, mo):
-    e6
-    mo.md(
-        r"""
-        ---
-        ## 7 · Leer `aminoacidos.tt`
-        > *Lee el contenido del archivo "aminoacidos.tt".*
-
-        **Pista:** tres lectores de texto:
-
-        | Comando | Comportamiento |
-        |---|---|
-        | `cat` | vuelca **todo** de golpe (no interactivo) |
-        | `more` | por pantallas, solo hacia abajo |
-        | `less` | por pantallas, **arriba y abajo** (`q` para salir) |
-
-        Aquí usamos `cat`, pero el cuaderno **recorta** la salida a 12 líneas. Con `wc -l`
-        contamos líneas: 4 líneas = 1 lectura FASTQ.
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e6, mo, term):
-    e6
-    e7 = mo.vstack([
-        term.sh("cat aminoacidos.tt", max_lines=12),
-        term.sh("wc -l aminoacidos.tt"),
-        check("el archivo tiene contenido",
-              int(term.out("wc -l < aminoacidos.tt") or 0) > 0),
-    ])
-    e7
-    return (e7,)
-
-
-# ═════════════════════════ 8 · ln -s ═════════════════════════
-@app.cell(hide_code=True)
-def _(e7, mo):
-    e7
-    mo.md(
-        r"""
-        ---
-        ## 8 · Enlace simbólico a `Secuencias.txt`
-        > *Crea un enlace simbólico al archivo Secuencias.txt dentro de la nueva carpeta creada.*
-
-        **Pista:** `ln -s DESTINO NOMBRE_DEL_ENLACE`. Sin `-s` crea un *enlace duro*.
-
-        ⚠️ **Error clásico:** la ruta del destino se interpreta **desde la carpeta donde vive el
-        enlace**. Estamos en `Datos`, y `Secuencias.txt` está **un nivel por encima** → hay que
-        usar `../Secuencias.txt`. Primero lo hacemos mal a propósito (como en la clase) y luego
-        lo corregimos.
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e7, mo, term):
-    e7
-    _mal = term.sh("ln -s Secuencias.txt Secuencias.txt\nls -l\ncat Secuencias.txt")
-    _roto = term.out("test -L Secuencias.txt && ! test -e Secuencias.txt && echo roto") == "roto"
-    _bien = term.sh("rm Secuencias.txt\nln -s ../Secuencias.txt Secuencias.txt\nls -l")
-    e8 = mo.vstack([
-        mo.md("**① Intento incorrecto** — el enlace apunta a `Datos/Secuencias.txt`, que no existe:"),
-        _mal,
-        check("el primer enlace estaba roto (apuntaba a sí mismo)", _roto),
-        mo.md("**② Correcto** — `../` sube un nivel:"),
-        _bien,
-        check("el enlace apunta a `../Secuencias.txt` y funciona",
-              term.out("readlink Secuencias.txt") == "../Secuencias.txt"
-              and term.out("test -e Secuencias.txt && echo ok") == "ok"),
-    ])
-    e8
-    return (e8,)
-
-
-# ═════════════════════════ 9 · leer el enlace ═════════════════════════
-@app.cell(hide_code=True)
-def _(e8, mo):
-    e8
-    mo.md(
-        r"""
-        ---
-        ## 9 · Leer el enlace simbólico
-        > *Lee el contenido del nuevo enlace simbólico de Secuencias.txt.*
-
-        **Pista:** un enlace simbólico se lee **igual que un archivo normal**; el sistema sigue
-        el "atajo" hasta el archivo real.
-        """
-    )
-    return
-
-
-@app.cell
-def _(check, e8, mo, term):
-    e8
-    _a = term.out("md5sum < Secuencias.txt")
-    _b = term.out("md5sum < ../Secuencias.txt")
-    e9 = mo.vstack([
-        term.sh("cat Secuencias.txt", max_lines=8),
-        check("leer el enlace equivale a leer el original", _a == _b),
-    ])
-    e9
-    return (e9,)
-
-
-# ═════════════════════════ 10 · nano (emulado) ═════════════════════════
-@app.cell(hide_code=True)
-def _(e9, mo):
-    e9
-    mo.md(
-        r"""
-        ---
-        ## 10 · Añadir una línea al original y volver a leerlo
-        > *Añade una nueva línea al archivo de texto utilizando el editor nano y vuelve a leer el
-        > contenido del archivo original Secuencias.txt que se encuentra fuera de la carpeta.*
-
-        **En una terminal real:**
-
-        ```bash
-        cd ..                    # salimos de Datos
-        nano Secuencias.txt      # escribe la línea al final
-        #   Ctrl+O  → guardar (Enter para confirmar el nombre)
-        #   Ctrl+X  → salir de nano
-        tail -n 3 Secuencias.txt
-nano es interactivo y no puede ejecutarse dentro de una celda, así que aquí lo
-emulamos con echo "…" >> archivo, que añade (append) una línea al final.
-⚠️ >> añade; un solo > sobrescribe el archivo entero.
-
-Lo importante de este ejercicio — compara los tres archivos tras editar el original:
-
-Archivo	¿Qué es?	¿Ve la línea nueva?
-Tema1/Secuencias.txt	el original	✔ (lo hemos editado)
-Datos/aminoacidos.tt	una copia (vida propia)	✘
-Datos/Secuencias.txt	un enlace simbólico (atajo)	✔
-"""		
-)		
-return		
-@app.cell
-def _(check, e9, mo, term):
-e9
-_s1 = term.sh("cd ..\npwd")
-_s2 = term.sh('echo "Estoy añadiendo una nueva línea" >> Secuencias.txt')
-_s3 = term.sh(
-"tail -n 2 Secuencias.txt\n"
-"tail -n 2 Datos/aminoacidos.tt\n"
-"tail -n 2 Datos/Secuencias.txt"
-)
-_nueva = "Estoy añadiendo una nueva línea"
-e10 = mo.vstack([
-_s1, _s2, _s3,
-check("el original contiene la línea nueva",
-_nueva in term.out("tail -n 1 Secuencias.txt")),
-check("la copia aminoacidos.tt NO la contiene (es independiente)",
-_nueva not in term.out("tail -n 1 Datos/aminoacidos.tt")),
-check("el enlace Datos/Secuencias.txt SÍ la contiene (apunta al original)",
-_nueva in term.out("tail -n 1 Datos/Secuencias.txt")),
-])
-e10
-return (e10,)
-
-═════════════════════════ 11 · rm ═════════════════════════
-@app.cell(hide_code=True)
-def _(e10, mo):
-e10
-mo.md(
-r"""
-
-11 · Eliminar aminoacidos.tt
-Elimina el archivo aminoacidos.tt.
-
-Pista: rm = remove. ⚠️ En Linux no hay papelera. Para borrar carpetas haría
-falta rm -r; con -i te pide confirmación.
-"""
-)
-return
-
-@app.cell
-def _(check, e10, mo, term):
-e10
-e11 = mo.vstack([
-term.sh("rm Datos/aminoacidos.tt\nls -l Datos"),
-check("aminoacidos.tt ya no existe",
-term.out("test -e Datos/aminoacidos.tt && echo si") != "si"),
-check("el original y el enlace siguen intactos",
-term.out("test -e Secuencias.txt && test -L Datos/Secuencias.txt && echo ok") == "ok"),
-])
-e11
-return (e11,)
-
-═════════════════════════ Hoja de respuestas ═════════════════════════
-@app.cell(hide_code=True)
-def _(e11, mo):
-e11
-mo.md(
-r"""
-
-📋 Hoja de respuestas (para pegar en el documento y entregar en PDF)
-bash
-# 1. Ruta actual
-pwd
-
-# 2. Listar archivos y carpetas
-ls
-
-# 3. Entrar en Tema1
-cd Tema1
-
-# 4. Crear la carpeta Datos
-mkdir Datos
-
-# 5. Copiar Secuencias.txt dentro de Datos
-cp Secuencias.txt Datos/
-
-# 6. Renombrar la copia
-cd Datos
-mv Secuencias.txt aminoacidos.tt
-
-# 7. Leer aminoacidos.tt
-cat aminoacidos.tt            # (o: less aminoacidos.tt)
-
-# 8. Enlace simbólico al original (que está un nivel por encima)
-ln -s ../Secuencias.txt Secuencias.txt
-
-# 9. Leer el enlace simbólico
-cat Secuencias.txt
-
-# 10. Editar el original con nano y releerlo
-cd ..
-nano Secuencias.txt           # Ctrl+O, Enter, Ctrl+X
-cat Secuencias.txt            # (o: tail Secuencias.txt)
-
-# 11. Eliminar aminoacidos.tt
-rm Datos/aminoacidos.tt
-Preguntas de repaso
-¿Por qué el enlace de la 8 falla si escribimos ln -s Secuencias.txt Secuencias.txt
-desde Datos?
-
-¿Por qué la copia no recibe la línea nueva y el enlace sí?
-
-¿Qué pasaría con el enlace si borráramos el original? (pruébalo en la terminal libre)
-"""
-)
-return
-
-# ═════════════════════════ Terminal interactivo (REPL real) ═════════════════════════
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-        ---
-        ## 🧪 Terminal interactivo (REPL)
-
-        Escribe un comando y pulsa **Enter** (o ▶). El prompt refleja tu `cd` actual.
-        Comandos disponibles: `pwd`, `ls`, `cd`, `mkdir`, `cp`, `mv`, `cat`, `rm`,
-        `ln -s`, `wc`, `md5sum`, `head`, `tail`, `readlink`, `test`, `echo`, `clear`.
-
-        También puedes usar `&&`, `<`, `>` y `>>`.
-        """)
-    return
-
-
-# ─── Estado (se recrea al reiniciar, porque depende de HOME) ───
-@app.cell(hide_code=True)
-def _(HOME, mo):
-    get_cwd, set_cwd = mo.state(str(HOME))
-    get_hist, set_hist = mo.state([])
-    return get_cwd, get_hist, set_cwd, set_hist
-
-
-# ─── Entrada: el comando se ejecuta en un callback ───
-@app.cell(hide_code=True)
-def _(HOME, Terminal, get_cwd, get_hist, mo, set_cwd, set_hist):
-    def _run(value):
-        cmd = (value or "").strip()
-        if not cmd:
-            return
-        if cmd == "clear":
-            set_hist([])
-            return
-        t = Terminal(HOME)
-        t.cwd = get_cwd()
-        prompt = t.prompt          # prompt ANTES de ejecutar
-        out, err = t.run(cmd)
-        set_hist(get_hist() + [(prompt, cmd, out, err)])
-        set_cwd(t.cwd)
-
-    cmd_form = mo.ui.form(
-        mo.ui.text(placeholder="escribe un comando y pulsa Enter…", full_width=True),
-        clear_on_submit=True,
+def _(exercise_card, mo):
+    f1 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
         submit_button_label="▶ Ejecutar",
-        on_change=_run,
+        bordered=False,
     )
-    cmd_form
-    return (cmd_form,)
+    exercise_card(
+        1,
+        r"""¿En qué ruta estoy?""",
+        r"""Identifica la ruta completa en la que te encuentras una vez que has iniciado la terminal.""",
+        r"""Todo en Linux parte de un **directorio de trabajo**: la carpeta en la que estás ahora mismo. La ruta absoluta empieza siempre por `/`. Aquí verás la ruta del laboratorio virtual (en tu ordenador será otra).""",
+        r"""El comando se llama `pwd` (*print working directory*).""",
+        f1,
+    )
+    return (f1,)
 
 
-# ─── Historial + prompt actual ───
 @app.cell(hide_code=True)
-def _(HOME, Terminal, cmd_form, get_cwd, get_hist, mo):
-    _t = Terminal(HOME)
-    _t.cwd = get_cwd()
-
-    _lines = []
-    for _prompt, _cmd, _out, _err in get_hist():
-        _lines.append(f"{_prompt} {_cmd}")
-        if _out:
-            _lines.extend(_out.rstrip("\n").split("\n"))
-        if _err:
-            _lines.extend(f"[stderr] {_l}" for _l in _err.rstrip("\n").split("\n"))
-
-    _lines.append(f"{_t.prompt} █")
-    if not get_hist():
-        _lines += ["", "Comandos: pwd · ls · cd · mkdir · cp · mv · cat · rm · ln -s · wc · md5sum · tail · echo · clear"]
-
-    mo.md("```console\n" + "\n".join(_lines) + "\n```")
+def _(SEED, f1, mo, render_result, run_exercise):
+    mo.stop(
+        not f1.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(1, f1.value, SEED))
     return
-if name == "main":
-app.run()
+
+
+# ═════════════════════════ 2 · Listar archivos y carpetas ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f2 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        2,
+        r"""Listar archivos y carpetas""",
+        r"""Genera el listado de archivos y carpetas que se encuentran en la posición en la que te encuentras.""",
+        r"""Variantes útiles: `ls -l` (formato largo: permisos, dueño, tamaño), `ls -a` (incluye ocultos). Verás **una sola carpeta: `Tema1`** (todavía no hemos entrado en ella).""",
+        r"""`ls` = *list*.""",
+        f2,
+    )
+    return (f2,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f2, mo, render_result, run_exercise):
+    mo.stop(
+        not f2.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(2, f2.value, SEED))
+    return
+
+
+# ═════════════════════════ 3 · Entrar en la carpeta Tema1 ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f3 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        3,
+        r"""Entrar en la carpeta `Tema1`""",
+        r"""Navega hasta dentro de la carpeta descargada como Tema1.""",
+        r"""`cd` = *change directory*. Fíjate en que **el prompt cambia** (`~` → `~/Tema1`). Atajos: `.` = aquí · `..` = carpeta superior · `~` = tu carpeta personal.""",
+        r"""`cd Tema1`. Con `cd tema1` (minúscula) falla: Linux distingue mayúsculas.""",
+        f3,
+    )
+    return (f3,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f3, mo, render_result, run_exercise):
+    mo.stop(
+        not f3.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(3, f3.value, SEED))
+    return
+
+
+# ═════════════════════════ 4 · Crear la carpeta Datos ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f4 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        4,
+        r"""Crear la carpeta `Datos`""",
+        r"""Crea una nueva carpeta denominada "Datos".""",
+        r"""`mkdir` = *make directory*. Linux distingue mayúsculas: `Datos` ≠ `datos`.""",
+        r"""`mkdir Datos`. Comprueba con `ls`.""",
+        f4,
+    )
+    return (f4,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f4, mo, render_result, run_exercise):
+    mo.stop(
+        not f4.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(4, f4.value, SEED))
+    return
+
+
+# ═════════════════════════ 5 · Copiar Secuencias.txt dentro de Datos ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f5 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        5,
+        r"""Copiar `Secuencias.txt` dentro de `Datos`""",
+        r"""Haz una copia del archivo Secuencias.txt dentro de la nueva carpeta "Datos".""",
+        r"""`cp ORIGEN DESTINO`. Si el destino es una carpeta, el archivo conserva su nombre. Una **copia es un archivo nuevo e independiente**: lo puedes comprobar con `md5sum` (mismo contenido ⇒ mismo código).""",
+        r"""`cp Secuencias.txt Datos/`. Para comprobar: `ls Datos` y `md5sum Secuencias.txt Datos/Secuencias.txt`.""",
+        f5,
+    )
+    return (f5,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f5, mo, render_result, run_exercise):
+    mo.stop(
+        not f5.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(5, f5.value, SEED))
+    return
+
+
+# ═════════════════════════ 6 · Renombrar la copia a aminoacidos.tt ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f6 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        6,
+        r"""Renombrar la copia a `aminoacidos.tt`""",
+        r"""Cambia el nombre del archivo Secuencias.txt y denomínalo "aminoacidos.tt".""",
+        r"""`mv ORIGEN DESTINO` sirve para **mover y para renombrar**. Entra en `Datos` para renombrar **la copia** (no el original). Cambiar el nombre **no cambia el contenido** (el md5 es el mismo).""",
+        r"""Dos comandos: `cd Datos` y `mv Secuencias.txt aminoacidos.tt` (en líneas separadas o unidos con `&&`).""",
+        f6,
+    )
+    return (f6,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f6, mo, render_result, run_exercise):
+    mo.stop(
+        not f6.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(6, f6.value, SEED))
+    return
+
+
+# ═════════════════════════ 7 · Leer aminoacidos.tt ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f7 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        7,
+        r"""Leer `aminoacidos.tt`""",
+        r"""Lee el contenido del archivo "aminoacidos.tt".""",
+        r"""Tres lectores de texto:
+
+| Comando | Comportamiento |
+|---|---|
+| `cat` | vuelca **todo** de golpe (no interactivo) |
+| `more` | por pantallas, solo hacia abajo |
+| `less` | por pantallas, **arriba y abajo** (`q` para salir) |
+
+Aquí `more` y `less` se comportan como `cat` (no hay modo interactivo en el navegador). Con `wc -l` cuentas líneas: 4 líneas = 1 lectura FASTQ.""",
+        r"""`cat aminoacidos.tt` (estás dentro de `Datos`).""",
+        f7,
+    )
+    return (f7,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f7, mo, render_result, run_exercise):
+    mo.stop(
+        not f7.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(7, f7.value, SEED))
+    return
+
+
+# ═════════════════════════ 8 · Enlace simbólico a Secuencias.txt ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f8 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        8,
+        r"""Enlace simbólico a `Secuencias.txt`""",
+        r"""Crea un enlace simbólico al archivo Secuencias.txt dentro de la nueva carpeta creada.""",
+        r"""`ln -s DESTINO NOMBRE_DEL_ENLACE`. Sin `-s` crea un *enlace duro*.
+
+⚠️ **Error clásico:** la ruta del destino se interpreta **desde la carpeta donde vive el enlace**. Estás en `Datos` y `Secuencias.txt` está **un nivel por encima**. Prueba primero el intento incorrecto (`ln -s Secuencias.txt Secuencias.txt`, luego `ls -l` y `cat Secuencias.txt`) y después corrígelo (`rm` del enlace roto y crearlo bien). Puedes hacerlo todo en el mismo envío.""",
+        r"""El destino correcto es `../Secuencias.txt`: `ln -s ../Secuencias.txt Secuencias.txt`.""",
+        f8,
+    )
+    return (f8,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f8, mo, render_result, run_exercise):
+    mo.stop(
+        not f8.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(8, f8.value, SEED))
+    return
+
+
+# ═════════════════════════ 9 · Leer el enlace simbólico ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f9 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        9,
+        r"""Leer el enlace simbólico""",
+        r"""Lee el contenido del nuevo enlace simbólico de Secuencias.txt.""",
+        r"""Un enlace simbólico se lee **igual que un archivo normal**: el sistema sigue el "atajo" hasta el archivo real.""",
+        r"""Estando en `Datos`: `cat Secuencias.txt`.""",
+        f9,
+    )
+    return (f9,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f9, mo, render_result, run_exercise):
+    mo.stop(
+        not f9.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(9, f9.value, SEED))
+    return
+
+
+# ═════════════════════════ 10 · Añadir una línea al original y volver a leerlo ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f10 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        10,
+        r"""Añadir una línea al original y volver a leerlo""",
+        r"""Añade una nueva línea al archivo de texto utilizando el editor nano y vuelve a leer el contenido del archivo original Secuencias.txt que se encuentra fuera de la carpeta.""",
+        r"""**En una terminal real** usarías `cd ..`, luego `nano Secuencias.txt` (escribes la línea, `Ctrl+O` guarda, `Ctrl+X` sale) y por último `cat` o `tail`.
+
+`nano` es interactivo y no se puede usar en el navegador, así que aquí lo emulamos con `echo "…" >> archivo`, que **añade** una línea al final. ⚠️ `>>` añade; un solo `>` **sobrescribe** el archivo entero.
+
+Compara los tres archivos tras editar el original:
+
+| Archivo | ¿Qué es? | ¿Ve la línea nueva? |
+|---|---|---|
+| `Tema1/Secuencias.txt` | el original | ✔ (lo hemos editado) |
+| `Datos/aminoacidos.tt` | una copia (vida propia) | ✘ |
+| `Datos/Secuencias.txt` | un enlace simbólico (atajo) | ✔ |""",
+        r"""`cd ..`, luego `echo "Estoy añadiendo una nueva línea" >> Secuencias.txt` y `cat Secuencias.txt`. Para comparar: `tail -n 2 Datos/aminoacidos.tt Datos/Secuencias.txt`.""",
+        f10,
+    )
+    return (f10,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f10, mo, render_result, run_exercise):
+    mo.stop(
+        not f10.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(10, f10.value, SEED))
+    return
+
+
+# ═════════════════════════ 11 · Eliminar aminoacidos.tt ═════════════════════════
+@app.cell(hide_code=True)
+def _(exercise_card, mo):
+    f11 = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    exercise_card(
+        11,
+        r"""Eliminar `aminoacidos.tt`""",
+        r"""Elimina el archivo aminoacidos.tt.""",
+        r"""`rm` = *remove*. ⚠️ En Linux **no hay papelera**. Para borrar carpetas haría falta `rm -r`.""",
+        r"""Estás en `Tema1`: `rm Datos/aminoacidos.tt`.""",
+        f11,
+    )
+    return (f11,)
+
+
+@app.cell(hide_code=True)
+def _(SEED, f11, mo, render_result, run_exercise):
+    mo.stop(
+        not f11.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    render_result(run_exercise(11, f11.value, SEED))
+    return
+
+
+# ═════════════════════════ Hoja de respuestas ═════════════════════════
+@app.cell(hide_code=True)
+def _(SOLUTIONS, mo):
+    _titulos = [
+        "Ruta actual", "Listar archivos y carpetas", "Entrar en Tema1", "Crear la carpeta Datos",
+        "Copiar Secuencias.txt dentro de Datos", "Renombrar la copia", "Leer aminoacidos.tt",
+        "Enlace simbólico al original (un nivel por encima)", "Leer el enlace simbólico",
+        "Editar el original (nano en una terminal real) y releerlo", "Eliminar aminoacidos.tt",
+    ]
+    _lineas = []
+    for _i, _cmds in enumerate(SOLUTIONS):
+        _lineas.append(f"# {_i + 1}. {_titulos[_i]}")
+        _lineas.extend(_cmds)
+        _lineas.append("")
+    _hoja = "\n".join(_lineas).replace(
+        'echo "Estoy añadiendo una nueva línea" >> Secuencias.txt',
+        'nano Secuencias.txt           # Ctrl+O, Enter, Ctrl+X  (aquí: echo "..." >> Secuencias.txt)',
+    )
+
+    mo.vstack([
+        mo.md(
+            r"""
+            ---
+            ## 📋 Hoja de respuestas (para pegar en el documento y entregar en PDF)
+            """
+        ),
+        mo.md("```bash\n" + _hoja + "\n```"),
+        mo.md("### Preguntas de repaso"),
+        mo.accordion({
+            "1. ¿Por qué falla el enlace del ejercicio 8 con `ln -s Secuencias.txt Secuencias.txt` desde `Datos`?":
+                mo.md("Porque la ruta del destino se interpreta **desde la carpeta donde vive el enlace**. "
+                      "En `Datos` no existe ningún `Secuencias.txt` (el original está un nivel por encima), "
+                      "así que el enlace apunta a sí mismo y queda **roto**. La ruta correcta es `../Secuencias.txt`."),
+            "2. ¿Por qué la copia no recibe la línea nueva y el enlace sí?":
+                mo.md("La **copia** es un archivo independiente (sus propios datos). El **enlace simbólico** "
+                      "solo guarda una ruta hacia el original, así que al leerlo siempre ves el contenido actual del original."),
+            "3. ¿Qué pasaría con el enlace si borráramos el original?":
+                mo.md("Quedaría **roto** (*dangling*): `ls -l` mostraría el destino, pero `cat` daría "
+                      "*No such file or directory*. Pruébalo en la terminal libre con el estado "
+                      "«10 ejercicios hechos»: `rm Secuencias.txt` y luego `cat Datos/Secuencias.txt`."),
+        }),
+    ])
+    return
+
+
+# ═════════════════════════ Terminal libre ═════════════════════════
+@app.cell(hide_code=True)
+def _(mo):
+    start_sel = mo.ui.dropdown(
+        options={
+            "Laboratorio limpio (solo Secuencias.txt)": 0,
+            "Con los 10 primeros ejercicios hechos (copia + enlace)": 10,
+            "Con los 11 ejercicios hechos": 11,
+        },
+        value="Laboratorio limpio (solo Secuencias.txt)",
+        label="Estado inicial: ",
+    )
+    ffree = mo.ui.form(
+        mo.ui.text_area(placeholder="Escribe aquí tus comandos (uno por línea)…", full_width=True),
+        submit_button_label="▶ Ejecutar",
+        bordered=False,
+    )
+    mo.vstack([
+        mo.md(
+            r"""
+            ---
+            ## 🧪 Terminal libre
+
+            Experimenta sin comprobaciones. Escribe los comandos que quieras (uno por línea) y pulsa
+            **▶ Ejecutar**: se ejecutan **desde el estado inicial elegido**, así que cada envío empieza de cero
+            (incluye todos los comandos que quieras probar en el mismo envío).
+
+            Disponibles: `pwd` `ls` `cd` `mkdir` `rmdir` `touch` `cp` `mv` `rm` `ln -s` `cat` `less` `more`
+            `head` `tail` `wc` `md5sum` `readlink` `test` `echo` · operadores `&&` `||` `;` `|` `<` `>` `>>`
+            """
+        ),
+        start_sel,
+        ffree,
+    ])
+    return ffree, start_sel
+
+
+@app.cell(hide_code=True)
+def _(SEED, ffree, mo, run_free, start_sel):
+    mo.stop(
+        not ffree.value,
+        mo.callout(mo.md("✍️ Escribe tus comandos y pulsa **▶ Ejecutar**."), kind="neutral"),
+    )
+    mo.md("```console\n" + run_free(ffree.value, SEED, start_sel.value) + "\n```")
+    return
+
+
+if __name__ == "__main__":
+    app.run()
