@@ -1084,24 +1084,136 @@ desde Datos?
 )
 return
 
-═════════════════════════ Terminal libre ═════════════════════════
+# ═════════════════════════ Terminal interactivo (REPL real) ═════════════════════════
 @app.cell(hide_code=True)
-def _(e11, mo):
-e11
-cmd_box = mo.ui.text(
-value="ls -l Datos",
-label="Terminal libre (FS virtual del navegador) · escribe una orden:",
-full_width=True,
-)
-run_btn = mo.ui.run_button(label="▶ Ejecutar")
-mo.vstack([mo.md("---\n## 🧪 Terminal libre"), cmd_box, run_btn])
-return cmd_box, run_btn
+def _(mo):
+    mo.md(r"""
+        ---
+        ## 🧪 Terminal interactivo (REPL)
 
+        Escribe un comando y pulsa **Enter** (o ▶). El prompt refleja tu `cd` actual.
+        Comandos disponibles: `pwd`, `ls`, `cd`, `mkdir`, `cp`, `mv`, `cat`, `rm`,
+        `ln -s`, `wc`, `md5sum`, `head`, `tail`, `readlink`, `test`, `echo`, `clear`.
+
+        También puedes usar `&&`, `<`, `>` y `>>`.
+        """)
+    return
+
+
+# ─── Estado del terminal ───
 @app.cell(hide_code=True)
-def _(cmd_box, mo, run_btn, term):
-mo.stop(not run_btn.value, mo.md("Pulsa ▶ Ejecutar para lanzar la orden."))
-term.sh(cmd_box.value, max_lines=30)
-return
+def _(mo):
+    get_term, set_term = mo.state({
+        "home": None,
+        "cwd":  None,
+        "entries": [],
+    })
+    return (get_term, set_term)
+
+
+# ─── Prompt actual ───
+@app.cell(hide_code=True)
+def _(mo, HOME, get_term):
+    import os as _os
+    _state = get_term()
+    _cur = str(HOME)
+    if _state["home"] != _cur:
+        _cwd = _cur
+    else:
+        _cwd = _state["cwd"]
+    _rel = _os.path.relpath(_cwd, _cur)
+    _prompt = "alumno@lab:~$" if _rel == "." else f"alumno@lab:~/{_rel}$"
+    mo.md(f"**Prompt actual:** `{_prompt}`")
+    return
+
+
+# ─── Entrada (Enter para enviar) ───
+@app.cell(hide_code=True)
+def _(mo):
+    cmd_input = mo.ui.text(
+        placeholder="escribe un comando y pulsa Enter…",
+        full_width=True,
+    )
+    cmd_form = mo.ui.form(
+        cmd_input,
+        clear_on_submit=True,
+        submit_button_label="▶ Ejecutar",
+    )
+    cmd_form
+    return (cmd_form,)
+
+
+# ─── Ejecución ───
+@app.cell(hide_code=True)
+def _(mo, cmd_form, HOME, get_term, set_term, Terminal):
+    if cmd_form.value:
+        _state = dict(get_term())
+        _home = str(HOME)
+
+        # Si cambió HOME (reset), reinicia el estado
+        if _state["home"] != _home:
+            _state = {"home": _home, "cwd": _home, "entries": []}
+        else:
+            _state["entries"] = list(_state["entries"])
+
+        _cmd = cmd_form.value.strip()
+
+        if _cmd == "clear":
+            _state["entries"] = []
+            set_term(_state)
+        elif _cmd:
+            _term = Terminal(HOME)
+            _term.cwd = _state["cwd"]
+            _out, _err = _term.run(_cmd)
+            _state["entries"].append({
+                "cwd": _state["cwd"],
+                "cmd": _cmd,
+                "out": _out,
+                "err": _err,
+            })
+            _state["cwd"] = _term.cwd
+            set_term(_state)
+    return
+
+
+# ─── Historial de la sesión ───
+@app.cell(hide_code=True)
+def _(mo, HOME, get_term):
+    import os as _os
+
+    _state = get_term()
+    _home = str(HOME)
+
+    if _state["home"] != _home:
+        _entries, _cwd = [], _home
+    else:
+        _entries, _cwd = _state["entries"], _state["cwd"]
+
+    def _prompt(p):
+        try:
+            rel = _os.path.relpath(p, _home)
+            return "alumno@lab:~$" if rel == "." else f"alumno@lab:~/{rel}$"
+        except (ValueError, TypeError):
+            return "alumno@lab:~$"
+
+    _lines = []
+    for _e in _entries:
+        _lines.append(f"{_prompt(_e['cwd'])} {_e['cmd']}")
+        if _e["out"]:
+            _lines.extend(_e["out"].rstrip("\n").split("\n"))
+        if _e["err"]:
+            _lines.extend(f"[stderr] {_l}" for _l in _e["err"].rstrip("\n").split("\n"))
+
+    if not _lines:
+        _lines = [
+            f"{_prompt(_cwd)} █",
+            "",
+            "Escribe un comando arriba y pulsa Enter.",
+            "Comandos: pwd · ls · cd · mkdir · cp · mv · cat · rm · ln -s · wc · md5sum · tail · echo · clear",
+        ]
+
+    mo.md("```console\n" + "\n".join(_lines) + "\n```")
+    return
 
 if name == "main":
 app.run()
